@@ -15,18 +15,6 @@
       <a href="/jobs/create" class="btn btn-success">Create New Job</a>
     </div>
 
-    <!-- Filter Form -->
-    <form action="/jobs/filter" method="GET" class="mb-4 d-flex justify-content-between align-items-center">
-      <div class="input-group w-50">
-        <label class="input-group-text" for="status">Filter by Status:</label>
-        <select id="status" name="status" class="form-select">
-          <option value="active">Active</option>
-          <option value="expired">Expired</option>
-        </select>
-      </div>
-      <button type="submit" class="btn btn-primary">Filter</button>
-    </form>
-
     <!-- Job Table -->
     <table class="table table-hover table-striped">
       <thead class="table-dark">
@@ -41,7 +29,7 @@
         </tr>
       </thead>
       <tbody>
-        <% if (jobs.length > 0) { %>
+        <% if (jobs && jobs.length > 0) { %>
           <% jobs.forEach(job => { %>
             <tr>
               <td><a href="/jobs/<%= job.job_id %>" class="text-decoration-none"><%= job.title %></a></td>
@@ -58,10 +46,10 @@
                 <a href="/jobs/<%= job.job_id %>/apply" class="btn btn-info btn-sm">Apply</a>
               </td>
             </tr>
-          <% }) %>
+          <% }); %>
         <% } else { %>
           <tr>
-            <td colspan="7" class="text-center">No jobs found.</td>
+            <td colspan="7" class="text-center text-muted">No jobs found.</td>
           </tr>
         <% } %>
       </tbody>

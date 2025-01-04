@@ -7,6 +7,9 @@ const pool = require('./config/db'); // Dodaj konekciju prema bazi
 const app = express();
 const port = 3000;
 
+app.use(express.json()); // Parsira JSON tijelo zahtjeva
+app.use(express.urlencoded({ extended: true })); // Parsira URL-encoded podatke iz formi
+
 // Middleware za sesije
 app.use(
   session({
