@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
+const { ensureLoggedIn, ensureAdmin } = require('../middleware/auth');
 
 // Ruta za prikaz svih konkursa
 router.get('/', async (req, res) => {
@@ -24,19 +25,20 @@ router.get('/', async (req, res) => {
     res.render('jobs', { jobs: result.rows });
   } catch (err) {
     console.error('Error fetching jobs:', err);
-    res.status(500).send('Error fetching jobs');
+    res.status(500).render('error', { message: 'Error fetching jobs', error: err });
   }
 });
 
 // Ruta za prikaz forme za kreiranje konkursa
-router.get('/create', (req, res) => {
+router.get('/create', ensureLoggedIn, ensureAdmin, (req, res) => {
   res.render('create-job');
 });
 
 // Ruta za dodavanje novog konkursa
-router.post('/', async (req, res) => {
+router.post('/create', ensureLoggedIn, ensureAdmin, async (req, res) => {
+  const { title, description, requirements, deadline, created_by } = req.body;
+
   try {
-    const { title, description, requirements, deadline, created_by } = req.body;
     await pool.query(
       'INSERT INTO jobs (title, description, requirements, deadline, created_by, status) VALUES ($1, $2, $3, $4, $5, $6)',
       [title, description, requirements, deadline, created_by, 'active']
@@ -44,12 +46,12 @@ router.post('/', async (req, res) => {
     res.redirect('/jobs');
   } catch (err) {
     console.error('Error creating job:', err);
-    res.status(500).send('Error creating job');
+    res.status(500).render('error', { message: 'Error creating job', error: err });
   }
 });
 
 // Ruta za ažuriranje statusa konkursa
-router.post('/update-status', async (req, res) => {
+router.post('/update-status', ensureLoggedIn, ensureAdmin, async (req, res) => {
   try {
     await pool.query(`
       UPDATE jobs
@@ -61,104 +63,35 @@ router.post('/update-status', async (req, res) => {
     res.redirect('/jobs');
   } catch (err) {
     console.error('Error updating statuses:', err);
-    res.status(500).send('Error updating statuses');
+    res.status(500).render('error', { message: 'Error updating statuses', error: err });
   }
 });
 
-// Ruta za filtriranje konkursa po statusu
-router.get('/filter', async (req, res) => {
-    const { status } = req.query;
-  
-    try {
-      const result = await pool.query(
-        'SELECT * FROM jobs WHERE status = $1 ORDER BY created_at DESC',
-        [status]
-      );
-      res.render('jobs', { jobs: result.rows });
-    } catch (err) {
-      console.error('Error filtering jobs:', err);
-      res.status(500).send('Error filtering jobs');
-    }
-  });
-  
-  // Ruta za prikaz detalja konkursa
-  router.get('/:id', async (req, res) => {
-    const id = parseInt(req.params.id, 10);
-  
-    if (isNaN(id)) {
-      console.log('Invalid ID:', req.params.id);
-      return res.status(400).send('Invalid job ID');
-    }
-  
-    try {
-      const result = await pool.query('SELECT * FROM jobs WHERE job_id = $1', [id]);
-      const job = result.rows[0];
-  
-      if (!job) {
-        return res.status(404).send('Job not found');
-      }
-  
-      res.render('job-details', { job });
-    } catch (err) {
-      console.error('Error fetching job details:', err);
-      res.status(500).send('Error fetching job details');
-    }
-  });
-  
-
 // Ruta za prikaz detalja konkursa
-router.get('/:id', async (req, res) => {
-    const id = parseInt(req.params.id, 10); // Pokušaj konvertovati ID u broj
-  
-    if (isNaN(id)) {
-      console.log('Invalid ID:', req.params.id); // Debug: prikaz originalne vrijednosti
-      return res.status(400).send('Invalid job ID'); // Vraćanje greške klijentu
-    }
-  
-    try {
-      const result = await pool.query('SELECT * FROM jobs WHERE job_id = $1', [id]);
-      const job = result.rows[0];
-  
-      if (!job) {
-        return res.status(404).send('Job not found');
-      }
-  
-      res.render('job-details', { job });
-    } catch (err) {
-      console.error('Error fetching job details:', err);
-      res.status(500).send('Error fetching job details');
-    }
-  });
-    
-  
-// Ruta za filtriranje konkursa po statusu
-router.get('/filter', async (req, res) => {
-    const { status } = req.query;
-  
-    try {
-      const result = await pool.query(
-        'SELECT * FROM jobs WHERE status = $1 ORDER BY created_at DESC',
-        [status]
-      );
-      res.render('jobs', { jobs: result.rows });
-    } catch (err) {
-      console.error('Error filtering jobs:', err);
-      res.status(500).send('Error filtering jobs');
-    }
-  });
+router.get('/:id', ensureLoggedIn, async (req, res) => {
+  const id = parseInt(req.params.id, 10);
 
-  router.get('/active', async (req, res) => {
-    try {
-      const result = await pool.query('SELECT * FROM jobs WHERE status = $1 ORDER BY created_at DESC', ['active']);
-      res.render('active-jobs', { jobs: result.rows });
-    } catch (err) {
-      console.error('Error fetching active jobs:', err);
-      res.status(500).send('Error fetching active jobs');
+  if (isNaN(id)) {
+    return res.status(400).render('error', { message: 'Invalid job ID', error: { status: 400 } });
+  }
+
+  try {
+    const result = await pool.query('SELECT * FROM jobs WHERE job_id = $1', [id]);
+    const job = result.rows[0];
+
+    if (!job) {
+      return res.status(404).render('error', { message: 'Job not found', error: { status: 404 } });
     }
-  });
+
+    res.render('job-details', { job });
+  } catch (err) {
+    console.error('Error fetching job details:', err);
+    res.status(500).render('error', { message: 'Error fetching job details', error: err });
+  }
+});
 
 // Ruta za prijavu na konkurs (forma)
-router.get('/:id/apply', async (req, res) => {
+router.get('/:id/apply', ensureLoggedIn, async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -166,46 +99,40 @@ router.get('/:id/apply', async (req, res) => {
     const job = result.rows[0];
 
     if (!job) {
-      return res.status(404).send('Job not found');
+      return res.status(404).render('error', { message: 'Job not found', error: { status: 404 } });
     }
 
     res.render('apply-job', { job });
   } catch (err) {
     console.error('Error fetching job details for application:', err);
-    res.status(500).send('Error fetching job details for application');
+    res.status(500).render('error', { message: 'Error fetching job details for application', error: err });
   }
 });
 
 // Ruta za prijavu kandidata na konkurs
-router.post('/:id/apply', async (req, res) => {
-  const { id } = req.params; // ID konkursa (job_id)
-  const { candidate_id } = req.body; // ID kandidata iz forme
+router.post('/:id/apply', ensureLoggedIn, async (req, res) => {
+  const { id } = req.params;
+  const { candidate_id } = req.body;
 
   try {
-    // Debugging podataka
-    console.log('Job ID:', id); 
-    console.log('Candidate ID:', candidate_id);
-
-    // Provjeri da li su ID-evi validni
     if (!id || !candidate_id) {
-      return res.status(400).send('Job ID or Candidate ID is missing.');
+      return res.status(400).render('error', { message: 'Job ID or Candidate ID is missing.', error: { status: 400 } });
     }
 
     await pool.query(
       'INSERT INTO applications (job_id, candidate_id, status) VALUES ($1, $2, $3)',
-      [id, candidate_id, 'pending'] // Početni status
+      [id, candidate_id, 'pending']
     );
 
     res.send('Application submitted successfully!');
   } catch (err) {
-    console.error('Error submitting application:', err); // Prikaz stvarne greške
-    res.status(500).send('Error submitting application');
+    console.error('Error submitting application:', err);
+    res.status(500).render('error', { message: 'Error submitting application', error: err });
   }
 });
 
-
 // Ruta za prikaz svih prijava na konkurs
-router.get('/:id/applications', async (req, res) => {
+router.get('/:id/applications', ensureLoggedIn, ensureAdmin, async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -219,9 +146,72 @@ router.get('/:id/applications', async (req, res) => {
     res.render('job-applications', { applications: result.rows });
   } catch (err) {
     console.error('Error fetching applications:', err);
-    res.status(500).send('Error fetching applications');
+    res.status(500).render('error', { message: 'Error fetching applications', error: err });
   }
 });
 
-  
+// Ruta za pretragu konkursa
+router.get('/search', ensureLoggedIn, ensureAdmin, async (req, res) => {
+  const { query } = req.query;
+
+  if (!query || query.trim() === '') {
+    return res.status(400).render('error', { message: 'Search query cannot be empty.', error: { status: 400 } });
+  }
+
+  try {
+    const result = await pool.query(`
+      SELECT 
+        job_id, 
+        title, 
+        description, 
+        requirements, 
+        deadline, 
+        created_by, 
+        created_at,
+        CASE 
+          WHEN deadline >= CURRENT_DATE THEN 'active'
+          ELSE 'expired'
+        END AS status
+      FROM jobs
+      WHERE title ILIKE $1 OR description ILIKE $1
+      ORDER BY created_at DESC
+    `, [`%${query}%`]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).render('error', { message: 'No jobs found for the given search query.', error: { status: 404 } });
+    }
+
+    res.render('jobs', { jobs: result.rows });
+  } catch (err) {
+    console.error('Error searching jobs:', err);
+    res.status(500).render('error', { message: 'Error searching jobs.', error: err });
+  }
+});
+
+
+// Ruta za prikaz arhiviranih konkursa
+router.get('/archived', ensureLoggedIn, ensureAdmin, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        job_id, 
+        title, 
+        description, 
+        requirements, 
+        deadline, 
+        created_by, 
+        created_at,
+        'expired' AS status
+      FROM jobs
+      WHERE deadline < CURRENT_DATE
+      ORDER BY created_at DESC
+    `);
+
+    res.render('archived-jobs', { jobs: result.rows });
+  } catch (err) {
+    console.error('Error fetching archived jobs:', err);
+    res.status(500).render('error', { message: 'Error fetching archived jobs', error: err });
+  }
+});
+
 module.exports = router;

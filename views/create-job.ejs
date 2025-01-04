@@ -4,28 +4,43 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create Job</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-  <h1>Create Job</h1>
-  <form action="/jobs" method="POST">
-    <label for="title">Title:</label>
-    <input type="text" id="title" name="title" required><br>
-  
-    <label for="description">Description:</label>
-    <textarea id="description" name="description" required></textarea><br>
-  
-    <label for="requirements">Requirements:</label>
-    <textarea id="requirements" name="requirements" required></textarea><br>
-  
-    <label for="deadline">Deadline:</label>
-    <input type="date" id="deadline" name="deadline" required><br>
-  
-    <label for="created_by">Created By (Admin ID):</label>
-    <input type="number" id="created_by" name="created_by" required><br>
-  
-    <button type="submit">Create Job</button>
-  </form>
-  
-  
+  <div class="container mt-5">
+    <h1>Create Job Posting</h1>
+    <form action="/jobs/create" method="POST">
+      <div class="mb-3">
+        <label for="title" class="form-label">Job Title</label>
+        <input type="text" class="form-control" id="title" name="title" required>
+      </div>
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+      </div>
+      <div class="mb-3">
+        <label for="deadline" class="form-label">Deadline</label>
+        <input type="date" class="form-control" id="deadline" name="deadline" required>
+      </div>
+      <div class="mb-3">
+        <label for="required_documents" class="form-label">Required Documents</label>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="required_documents[]" value="cv" id="cv">
+          <label class="form-check-label" for="cv">CV</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="required_documents[]" value="cover_letter" id="cover_letter">
+          <label class="form-check-label" for="cover_letter">Motivational Letter</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="required_documents[]" value="certificates" id="certificates">
+          <label class="form-check-label" for="certificates">Certificates</label>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Create Job</button>
+      <a href="/admin-dashboard" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
