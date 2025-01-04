@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Applications</title>
+</head>
+<body>
+  <h1>Applications for Job</h1>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Application ID</th>
+        <th>Status</th>
+        <th>Applied At</th>
+        <th>CV</th>
+        <th>Skills</th>
+        <th>Experience</th>
+        <th>Education</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% applications.forEach(app => { %>
+        <tr>
+          <td><%= app.application_id %></td>
+          <td><%= app.status %></td>
+          <td><%= app.applied_at %></td>
+          <td><%= app.cv %></td>
+          <td><%= app.skills %></td>
+          <td><%= app.experience %></td>
+          <td><%= app.education %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  <a href="/jobs">Back to Jobs</a>
+</body>
+</html>

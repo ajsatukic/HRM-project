@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Listings</title>
+</head>
+<body>
+  <h1>Job Listings</h1>
+  <a href="/jobs/create">Create New Job</a>
+
+  <form action="/jobs/filter" method="GET">
+    <label for="status">Filter by Status:</label>
+    <select id="status" name="status">
+      <option value="active">Active</option>
+      <option value="expired">Expired</option>
+    </select>
+    <button type="submit">Filter</button>
+  </form>
+  
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Requirements</th>
+        <th>Deadline</th>
+        <th>Created By</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% jobs.forEach(job => { %>
+        <tr>
+          <td>
+            <a href="/jobs/<%= job.job_id %>"><%= job.title %></a>
+          </td>              
+          <td><%= job.description %></td>
+          <td><%= job.requirements %></td>
+          <td><%= job.deadline %></td>
+          <td><%= job.created_by %></td>
+          <td><%= job.status %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  
+</body>
+</html>
