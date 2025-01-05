@@ -37,11 +37,13 @@ app.set('view engine', 'ejs');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const jobRoutes = require('./routes/jobs');
+const interviewsRoutes = require('./routes/interviews'); // Import ruta
 
 // Korištenje ruta
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/jobs', jobRoutes);
+app.use('/interviews', interviewsRoutes); // Ruta za intervjue
 
 // Glavna ruta
 app.get('/', (req, res) => {
