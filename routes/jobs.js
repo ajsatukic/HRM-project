@@ -295,7 +295,7 @@ router.get('/candidates/:candidate_id', ensureLoggedIn, ensureAdmin, async (req,
       SELECT 
         u.first_name,
         u.last_name,
-        c.job_id, 
+        c.job_id,
         u.email,
         c.candidate_id,
         c.cv,
@@ -323,15 +323,30 @@ router.get('/candidates/:candidate_id', ensureLoggedIn, ensureAdmin, async (req,
       ORDER BY com.created_at DESC
     `, [candidateId]);
 
+    // Dohvat recenzija vezanih za kandidata
+    const reviewsResult = await pool.query(`
+      SELECT 
+        r.rating, 
+        r.comment, 
+        r.created_at, 
+        CONCAT(u.first_name, ' ', u.last_name) AS created_by
+      FROM reviews r
+      JOIN users u ON r.created_by = u.user_id
+      WHERE r.candidate_id = $1
+      ORDER BY r.created_at DESC
+    `, [candidateId]);
+
     res.render('candidate-details', {
       candidate: candidateResult.rows[0],
-      comments: commentsResult.rows
+      comments: commentsResult.rows,
+      reviews: reviewsResult.rows // Dodavanje recenzija
     });
   } catch (err) {
-    console.error('Error fetching candidate details or comments:', err);
-    res.status(500).render('error', { message: 'Error fetching candidate details or comments', error: err });
+    console.error('Error fetching candidate details, comments, or reviews:', err);
+    res.status(500).render('error', { message: 'Error fetching candidate details, comments, or reviews', error: err });
   }
 });
+
 
 
 // Ruta za unos komentara
@@ -382,5 +397,6 @@ router.post('/applications/:application_id/status', ensureLoggedIn, ensureAdmin,
     res.status(500).send('Error updating application status');
   }
 });
+
 
 module.exports = router;

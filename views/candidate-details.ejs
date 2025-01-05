@@ -123,8 +123,38 @@
             <textarea name="notes" id="notes" class="form-control" rows="3"></textarea>
           </div>
           <button type="submit" class="btn btn-success">Schedule Interview</button>
+        </form> 
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header bg-warning text-white">Interview Review</div>
+      <div class="card-body">
+        <% if (reviews?.length > 0) { %>
+          <ul class="list-group mb-3">
+            <% reviews.forEach(review => { %>
+              <li class="list-group-item">
+                <strong><%= review.created_by %>:</strong> <%= review.comment %>
+                <br>
+                <small class="text-muted">Rating: <%= review.rating %>/10 | Posted on <%= new Date(review.created_at).toLocaleString() %></small>
+              </li>
+            <% }) %>
+          </ul>
+        <% } else { %>
+          <p>No reviews yet.</p>
+        <% } %>
+    
+        <form action="/interviews/candidates/<%= candidate?.candidate_id %>/reviews" method="POST">
+          <div class="mb-3">
+            <label for="rating" class="form-label">Rating (0-10)</label>
+            <input type="number" name="rating" id="rating" class="form-control" min="0" max="10" step="1" required>
+          </div>
+          <div class="mb-3">
+            <label for="comment" class="form-label">Review</label>
+            <textarea name="comment" id="comment" class="form-control" rows="3" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit Review</button>
         </form>
-        
       </div>
     </div>
     
