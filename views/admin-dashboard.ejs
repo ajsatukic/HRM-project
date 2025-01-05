@@ -6,122 +6,18 @@
   <title>Modern Admin Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Arial', sans-serif;
-      background: linear-gradient(135deg, #f395b3, #ffffff);
-      color: #4b4b4b;
-      min-height: 100vh;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    .header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-
-    .header h1 {
-      font-size: 2.8rem;
-      font-weight: bold;
-      color: #921b2f;
-      margin: 0;
-    }
-
-    .header p {
-      font-size: 1.2rem;
-      color: #66142c;
-    }
-
-    .card {
-      border: none;
-      border-radius: 15px;
-      margin-bottom: 30px;
-      background: #ffffff;
-      box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
-      overflow: hidden;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0px 12px 30px rgba(0, 0, 0, 0.2);
-    }
-
-    .card-header {
-      background: linear-gradient(135deg, #921b2f, #66142c);
-      color: #ffffff;
-      padding: 15px 20px;
-      font-size: 1.5rem;
-      font-weight: bold;
-    }
-
-    .card-body {
-      padding: 20px;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #f395b3, #921b2f);
-      border: none;
-      padding: 10px 20px;
-      border-radius: 50px;
-      font-size: 1rem;
-      font-weight: bold;
-      color: #ffffff;
-      text-transform: uppercase;
-      transition: all 0.3s ease;
-    }
-
-    .btn-primary:hover {
-      background: linear-gradient(135deg, #921b2f, #66142c);
-      transform: translateY(-3px);
-    }
-
-    .icon {
-      font-size: 2rem;
-      margin-right: 10px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      overflow: hidden;
-      border-radius: 10px;
-    }
-
-    table th, table td {
-      padding: 15px;
-      text-align: left;
-    }
-
-    table th {
-      background: #921b2f;
-      color: #ffffff;
-    }
-
-    table tr:nth-child(even) {
-      background: #f7c9d7;
-    }
-
-    table tr:hover {
-      background: #f395b3;
-      color: #ffffff;
-      cursor: pointer;
-    }
-  </style>
+  <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
 <body>
   <div class="container">
     <div class="header">
       <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
       <p>Seamlessly manage your job postings and applications</p>
+      <div class="text-end mt-3">
+        <form action="/logout" method="POST" style="display: inline;">
+          <button type="submit" class="btn btn-primary">Logout</button>
+        </form>
+      </div>      
     </div>
 
     <div class="row">
@@ -140,7 +36,7 @@
           <div class="card-header"><i class="fas fa-users icon"></i> Candidates</div>
           <div class="card-body">
             <p>Track and manage applications effectively.</p>
-            <a href="/jobs/applications" class="btn btn-primary">View Applications</a>
+            <a href="/jobs/applications/all" class="btn btn-primary">View Applications</a>
           </div>
         </div>
       </div>
@@ -159,14 +55,14 @@
 
       <div class="col-lg-6">
         <div class="card">
-          <div class="card-header"><i class="fas fa-cogs icon"></i> Settings</div>
+          <div class="card-header"><i class="fas fa-bell icon"></i> Notifications</div>
           <div class="card-body">
-            <p>Customize and manage your preferences.</p>
-            <a href="#settings" class="btn btn-primary">Manage Settings</a>
+            <p>Stay updated with the latest notifications.</p>
+            <a href="/notifications" class="btn btn-primary">View Notifications</a>
           </div>
         </div>
       </div>
-    </div>
+      
 
     <div class="row">
       <div class="col-12">

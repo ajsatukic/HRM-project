@@ -22,6 +22,7 @@ app.use(
 
 // Statički folder
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 
 // Middleware za parsiranje tijela zahtjeva
 app.use(express.json());
@@ -38,12 +39,14 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const jobRoutes = require('./routes/jobs');
 const interviewsRoutes = require('./routes/interviews'); // Import ruta
+const notificationsRouter = require('./routes/notifications');
 
 // Korištenje ruta
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/jobs', jobRoutes);
 app.use('/interviews', interviewsRoutes); // Ruta za intervjue
+app.use('/notifications',notificationsRouter);
 
 // Glavna ruta
 app.get('/', (req, res) => {
@@ -74,6 +77,22 @@ app.get('/admin-dashboard', ensureLoggedIn, ensureAdmin, async (req, res) => {
     res.status(500).send('Error loading admin dashboard');
   }
 });
+
+// Ruta za logout koristeći POST metodu
+app.post('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Error logging out:', err);
+      return res.status(500).send('An error occurred while logging out.');
+    }
+    res.redirect('/login'); // Preusmjeravanje na login stranicu
+  });
+});
+app.get('/login', (req, res) => {
+  res.render('login'); // Pretpostavljamo da imaš `login.ejs`
+});
+
+
 
 // User dashboard
 app.get('/user-dashboard', ensureLoggedIn, (req, res) => {

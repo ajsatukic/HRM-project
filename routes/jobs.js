@@ -159,7 +159,7 @@ router.get('/filter', ensureLoggedIn, ensureAdmin, async (req, res) => {
   }
 });
 
-//ruta details
+//ruta details za posao
 router.get('/:id', ensureLoggedIn, async (req, res) => {
   const id = parseInt(req.params.id, 10);
 
@@ -347,8 +347,6 @@ router.get('/candidates/:candidate_id', ensureLoggedIn, ensureAdmin, async (req,
   }
 });
 
-
-
 // Ruta za unos komentara
 router.post('/candidates/:candidate_id/comments', ensureLoggedIn, ensureAdmin, async (req, res) => {
   const candidateId = parseInt(req.params.candidate_id, 10);
@@ -395,6 +393,32 @@ router.post('/applications/:application_id/status', ensureLoggedIn, ensureAdmin,
   } catch (err) {
     console.error('Error updating application status:', err);
     res.status(500).send('Error updating application status');
+  }
+});
+
+//ruta za dohvacanje svih prijava
+router.get('/applications/all', ensureLoggedIn, ensureAdmin, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        u.first_name, 
+        u.last_name, 
+        u.email, 
+        c.skills, 
+        c.experience, 
+        c.education, 
+        j.title AS job_title 
+      FROM applications a
+      JOIN candidates c ON a.candidate_id = c.candidate_id
+      JOIN users u ON c.user_id = u.user_id
+      JOIN jobs j ON a.job_id = j.job_id
+      ORDER BY u.last_name ASC
+    `);
+
+    res.render('all-applications', { candidates: result.rows });
+  } catch (err) {
+    console.error('Error fetching all applications:', err);
+    res.status(500).render('error', { message: 'Error fetching all applications', error: err });
   }
 });
 

@@ -6,68 +6,7 @@
   <title>Applications for Job <%= jobId %></title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Arial', sans-serif;
-      background: linear-gradient(135deg, #f395b3, #ffffff);
-      color: #4b4b4b;
-      min-height: 100vh;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 50px auto;
-      padding: 20px;
-      background: #ffffff;
-      border-radius: 15px;
-      box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      font-weight: bold;
-      color: #921b2f;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 20px;
-    }
-
-    table th {
-      background: #921b2f;
-      color: #ffffff;
-      padding: 10px;
-      text-align: left;
-    }
-
-    table td {
-      padding: 10px;
-      background: #f7c9d7;
-    }
-
-    .btn-primary, .btn-success, .btn-info {
-      background: linear-gradient(135deg, #f395b3, #921b2f);
-      border: none;
-      padding: 10px 20px;
-      border-radius: 50px;
-      font-size: 1rem;
-      font-weight: bold;
-      color: #ffffff;
-      text-transform: uppercase;
-      transition: all 0.3s ease;
-    }
-
-    .btn-primary:hover, .btn-success:hover, .btn-info:hover {
-      background: linear-gradient(135deg, #921b2f, #66142c);
-      transform: translateY(-3px);
-    }
-  </style>
+  <link rel="stylesheet" href="/stylesheets/job-applications.css">
 </head>
 <body>
   <div class="container">
@@ -93,7 +32,7 @@
             <tr>
               <td><%= app.first_name %> <%= app.last_name %></td>
               <td><%= app.email %></td>
-              <td><a href="<%= app.cv %>" target="_blank" class="btn btn-info btn-sm">Download CV</a></td>
+              <td><a href="<%= app.cv %>" target="_blank" class="btn btn-primary btn-sm">Download CV</a></td>
               <td><%= app.skills %></td>
               <td><%= app.experience %></td>
               <td><%= app.education %></td>
@@ -114,10 +53,10 @@
                 <% } else { %>
                   <form action="/jobs/applications/<%= app.application_id %>/rate" method="POST">
                     <input type="number" name="rating" min="0" max="100" step="0.01" required>
-                    <button type="submit" class="btn btn-success btn-sm">Rate</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Rate</button>
                   </form>
                 <% } %>
-                <a href="/jobs/candidates/<%= app.candidate_id %>" class="btn btn-info btn-sm">Details</a>
+                <a href="/jobs/candidates/<%= app.candidate_id %>" class="btn btn-primary btn-sm">Details</a>
               </td>
             </tr>
           <% }) %>

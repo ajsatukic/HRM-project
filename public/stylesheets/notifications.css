@@ -1,0 +1,102 @@
+/* Global Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f3f0f5;
+    color: #2a1a29;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Container Styling */
+  .container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Header Section */
+  h1 {
+    color: #4c275f;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  /* Card Styling */
+  .card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-header {
+    background-color: #7a295c;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 15px;
+    border-radius: 12px 12px 0 0;
+  }
+  
+  .card-body {
+    padding: 20px;
+  }
+  
+  /* List Group Styling */
+  .list-group-item {
+    border: none;
+    border-bottom: 1px solid #e0d4e5;
+    padding: 15px 10px;
+    font-size: 16px;
+  }
+  
+  .list-group-item:last-child {
+    border-bottom: none;
+  }
+  
+  .notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .notification-header strong {
+    color: #7a295c;
+  }
+  
+  .notification-date {
+    font-size: 14px;
+    color: #7e5a79;
+  }
+  
+  /* Button Styling */
+  .btn-primary {
+    background-color: #7a295c;
+    color: #ffffff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 16px;
+    text-align: center;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background-color: #5e1e46;
+    transform: translateY(-2px);
+  }
+  
+  /* Responsive Styling */
+  @media (max-width: 768px) {
+    .container {
+      padding: 15px;
+    }
+  
+    h1 {
+      font-size: 24px;
+    }
+  }
+  

@@ -1,0 +1,94 @@
+/* Global Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f3f0f5;
+    color: #2a1a29;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Container Styling */
+  .container {
+    
+    margin: 40px auto;
+    background: #ffffff;
+    padding: 20px 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Header Section */
+  h1 {
+    font-size: 28px;
+    font-weight: bold;
+    color: #4c275f;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+  }
+  
+  h1 i {
+    margin-right: 10px;
+    color: #7a295c;
+  }
+  
+  /* Table Styling */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    overflow: hidden;
+  }
+  
+  table thead {
+    background-color: #4c275f;
+    color: #ffffff;
+  }
+  
+  table th, table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e0d4e5;
+  }
+  
+  table tbody tr:hover {
+    background-color: #f3eaf3;
+  }
+  
+  .table .btn-sm {
+    padding: 6px 10px;
+    font-size: 14px;
+    border-radius: 6px;
+  }
+  
+  /* Button Styling */
+  .btn-primary {
+    background-color: #7a295c;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    color: #ffffff;
+    border-radius: 8px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background-color: #5e1e46;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .container {
+      padding: 15px;
+    }
+  
+    table th, table td {
+      padding: 10px;
+    }
+  
+    h1 {
+      font-size: 22px;
+    }
+  }
+  

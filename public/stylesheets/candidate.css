@@ -1,0 +1,135 @@
+/* candidate-details.css */
+
+/* Global Styling */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f3f0f5;
+    color: #2a1a29;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Header Styling */
+  h1, h3 {
+    color: #4c275f;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+  
+  h1 {
+    font-size: 28px;
+  }
+  
+  h3 {
+    font-size: 22px;
+  }
+  
+  /* Card Styling */
+  .card {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+  
+  .card-header {
+    background-color: #7a295c;
+    color: #ffffff;
+    padding: 10px 15px;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .card-body {
+    padding: 15px;
+  }
+  
+  .card-body p {
+    margin-bottom: 10px;
+    color: #2a1a29;
+  }
+  
+  /* Buttons */
+  .btn {
+    background-color: #7a295c;
+    color: #ffffff;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn:hover {
+    background-color: #7a295c;
+  }
+  
+  /* Comments and Reviews Styling */
+  .list-group-item {
+    padding: 10px 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    border-radius: 5px;
+  }
+  
+  .list-group-item strong {
+    color: #4c275f;
+  }
+  
+  .text-muted {
+    font-size: 14px;
+    color: #888;
+  }
+  
+  /* Forms */
+  textarea {
+    resize: vertical;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  textarea:focus {
+    border-color: #4c275f;
+    outline: none;
+  }
+  
+  /* Table Styling */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  
+  table th {
+    background-color: #7a295c;
+    color: #ffffff;
+    text-align: left;
+    padding: 10px;
+  }
+  
+  table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+  }
+  
+  table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  table tr:hover {
+    background-color: #e6e6e6;
+  }
+  
