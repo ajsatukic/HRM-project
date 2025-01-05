@@ -295,6 +295,7 @@ router.get('/candidates/:candidate_id', ensureLoggedIn, ensureAdmin, async (req,
       SELECT 
         u.first_name,
         u.last_name,
+        c.job_id, 
         u.email,
         c.candidate_id,
         c.cv,
@@ -331,6 +332,7 @@ router.get('/candidates/:candidate_id', ensureLoggedIn, ensureAdmin, async (req,
     res.status(500).render('error', { message: 'Error fetching candidate details or comments', error: err });
   }
 });
+
 
 // Ruta za unos komentara
 router.post('/candidates/:candidate_id/comments', ensureLoggedIn, ensureAdmin, async (req, res) => {
@@ -380,6 +382,5 @@ router.post('/applications/:application_id/status', ensureLoggedIn, ensureAdmin,
     res.status(500).send('Error updating application status');
   }
 });
-
 
 module.exports = router;

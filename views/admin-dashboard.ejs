@@ -3,186 +3,250 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard</title>
+  <title>Modern Admin Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/stylesheets/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #f395b3, #ffffff);
+      color: #4b4b4b;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .header h1 {
+      font-size: 2.8rem;
+      font-weight: bold;
+      color: #921b2f;
+      margin: 0;
+    }
+
+    .header p {
+      font-size: 1.2rem;
+      color: #66142c;
+    }
+
+    .card {
+      border: none;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      background: #ffffff;
+      box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0px 12px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, #921b2f, #66142c);
+      color: #ffffff;
+      padding: 15px 20px;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f395b3, #921b2f);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #ffffff;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #921b2f, #66142c);
+      transform: translateY(-3px);
+    }
+
+    .icon {
+      font-size: 2rem;
+      margin-right: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      overflow: hidden;
+      border-radius: 10px;
+    }
+
+    table th, table td {
+      padding: 15px;
+      text-align: left;
+    }
+
+    table th {
+      background: #921b2f;
+      color: #ffffff;
+    }
+
+    table tr:nth-child(even) {
+      background: #f7c9d7;
+    }
+
+    table tr:hover {
+      background: #f395b3;
+      color: #ffffff;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <% if (typeof success !== 'undefined') { %>
-    <div class="alert alert-success text-center">
-      <%= success %>
+  <div class="container">
+    <div class="header">
+      <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+      <p>Seamlessly manage your job postings and applications</p>
     </div>
-  <% } %>
-  
-  <% if (typeof error !== 'undefined') { %>
-    <div class="alert alert-danger text-center">
-      <%= error %>
-    </div>
-  <% } %>
-  
 
-  <div class="container mt-5">
-    <h1 class="text-center">Admin Dashboard</h1>
-    <p class="text-muted text-center">Manage job postings and applications efficiently.</p>
-
-    <!-- Section for Job Postings -->
-    <div class="card mb-4">
-      <div class="card-header bg-primary text-white">
-        Job Postings
-        <a href="/jobs/create" class="btn btn-light btn-sm float-end">Create New Job</a>
-      </div>
-      <div class="card-body">
-        
-        <!-- Active Jobs Table -->
-        <div class="mb-4">
-          <label for="jobStatusFilter" class="form-label">Filter by Status:</label>
-          <select id="jobStatusFilter" class="form-select">
-            <option value="active">Active</option>
-            <option value="expired">Expired</option>
-          </select>
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header"><i class="fas fa-briefcase icon"></i> Job Postings</div>
+          <div class="card-body">
+            <p>Easily create and manage your job postings.</p>
+            <a href="/jobs/create" class="btn btn-primary">Create New Job</a>
+          </div>
         </div>
-        
-              
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Status</th>
-              <th>Actions</th>
-              <th>Applications</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% if (jobs && jobs.length > 0) { %>
-              <% jobs.forEach(job => { %>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header"><i class="fas fa-users icon"></i> Candidates</div>
+          <div class="card-body">
+            <p>Track and manage applications effectively.</p>
+            <a href="/jobs/applications" class="btn btn-primary">View Applications</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header"><i class="fas fa-comments icon"></i> Communication</div>
+          <div class="card-body">
+            <p>Streamline communication with candidates.</p>
+            <a href="/calendar" class="btn btn-primary">View Calendar</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header"><i class="fas fa-cogs icon"></i> Settings</div>
+          <div class="card-body">
+            <p>Customize and manage your preferences.</p>
+            <a href="#settings" class="btn btn-primary">Manage Settings</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header"><i class="fas fa-chart-bar icon"></i> Applications Overview</div>
+          <div class="card-body">
+            <table>
+              <thead>
                 <tr>
-                  <td><%= job.title %></td>
-                  <td><%= job.status %></td>
-                  <td>
-                    <a href="/jobs/<%= job.job_id %>" class="btn btn-info btn-sm">Details</a>
-                    <button class="btn btn-danger btn-sm delete-job-btn" data-id="<%= job.job_id %>">Delete</button>
-                  </td>
-                  <td>
-                    <a href="/jobs/<%= job.job_id %>/applications" class="btn btn-primary btn-sm">View Applications</a>
-                  </td>
-                  <td>
-                    <a href="/jobs/<%= job.job_id %>/rankings" class="btn btn-primary btn-sm">View Rankings</a>
-                  </td>                                   
+                  <th>Title</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                  <th>Applications</th>
+                  <th>Ranking</th>
                 </tr>
-              <% }); %>
-            <% } else { %>
-              <tr>
-                <td colspan="3" class="text-center text-muted">No jobs found.</td>
-              </tr>
-            <% } %>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-
-    <!-- Section for Candidates -->
-    <div class="card mb-4">
-      <div class="card-header bg-success text-white">
-        Candidates
-      </div>
-      <div class="card-body">
-        <h5>Applications Overview</h5>
-        <p>Total Applications: <%= stats.applications %></p>
-        <a href="/jobs" class="btn btn-primary">View Applications</a>
-      </div>
-    </div>
-
-    <!-- Section for Communication -->
-    <div class="card">
-      <div class="card-header bg-warning text-dark">
-        Communication with Candidates
-      </div>
-      <div class="card-body">
-        <h5>Manage Candidate Status</h5>
-        <a href="/jobs/applications" class="btn btn-secondary">Manage Applications</a>
-        <a href="/calendar" class="btn btn-secondary">Interview Calendar</a>
+              </thead>
+              <tbody>
+                <% if (jobs && jobs.length > 0) { %>
+                  <% jobs.forEach(job => { %>
+                    <tr>
+                      <td><%= job.title %></td>
+                      <td><%= job.status %></td>
+                      <td>
+                        <a href="/jobs/<%= job.job_id %>" class="btn btn-primary btn-sm">Details</a>
+                        <button class="btn btn-primary btn-sm delete-job-btn" data-id="<%= job.job_id %>">Delete</button>
+                      </td>
+                      <td>
+                        <a href="/jobs/<%= job.job_id %>/applications" class="btn btn-primary btn-sm">View Applications</a>
+                      </td>
+                      <td>
+                        <a href="/jobs/<%= job.job_id %>/rankings" class="btn btn-primary btn-sm">View Rankings</a>
+                      </td>
+                    </tr>
+                  <% }); %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="4">No job postings available</td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
-
 <script>
-  document.getElementById('jobStatusFilter').addEventListener('change', async (e) => {
-    const status = e.target.value;
+  document.addEventListener('DOMContentLoaded', () => {
+    const deleteButtons = document.querySelectorAll('.delete-job-btn');
 
-    try {
-      const response = await fetch(`/jobs/filter?status=${status}`);
-      const result = await response.json();
-
-      if (result.success) {
-        const jobsTableBody = document.querySelector('table tbody');
-        jobsTableBody.innerHTML = ''; // Očisti trenutne rezultate
-
-        result.jobs.forEach(job => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${job.title}</td>
-            <td>${job.status}</td>
-            <td>
-              <a href="/jobs/${job.job_id}" class="btn btn-info btn-sm">Details</a>
-              <button class="btn btn-danger btn-sm delete-job-btn" data-id="${job.job_id}">Delete</button>
-            </td>
-          `;
-          jobsTableBody.appendChild(row);
-        });
-
-        // Ponovo dodaj funkcionalnost za brisanje
-        addDeleteListeners();
-      } else {
-        alert(result.message);
-      }
-    } catch (err) {
-      console.error('Error filtering jobs:', err);
-      alert('An error occurred while filtering jobs.');
-    }
-  });
-
-  // Ponovno povezivanje funkcije za brisanje
-function addDeleteListeners() {
-  document.querySelectorAll('.delete-job-btn').forEach(button => {
-    button.addEventListener('click', async (e) => {
-      const jobId = button.getAttribute('data-id');
-      const confirmed = confirm('Are you sure you want to delete this job?');
-
-      if (!confirmed) return;
-
-      try {
-        const response = await fetch(`/jobs/${jobId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          alert(result.message);
-          button.closest('tr').remove();
-        } else {
-          alert(`Error: ${result.message}`);
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', async () => {
+        const jobId = button.getAttribute('data-id');
+        
+        if (!confirm('Are you sure you want to delete this job?')) {
+          return;
         }
-      } catch (err) {
-        console.error('Error deleting job:', err);
-        alert('An error occurred while deleting the job.');
-      }
+
+        try {
+          const response = await fetch(`/jobs/${jobId}`, {
+            method: 'DELETE'
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+            alert('Job deleted successfully');
+            button.closest('tr').remove(); // Uklanja red iz tabele
+          } else {
+            alert(result.message || 'Failed to delete job');
+          }
+        } catch (error) {
+          console.error('Error deleting job:', error);
+          alert('An error occurred while deleting the job.');
+        }
+      });
     });
   });
-}
-
-// Odmah pozovi funkciju za povezivanje na početku
-addDeleteListeners();
-
 </script>
-
 
 </html>
