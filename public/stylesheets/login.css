@@ -1,12 +1,18 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Arial', sans-serif;
+  font-family: 'Poppins', sans-serif;
+  color:#4c275f ;
+}
+
+a{
+  color: #4c275f;
+  text-decoration: none;
 }
 
 .login-wrapper {
   height: 100vh;
-  background: linear-gradient(135deg, #921b2f, #f395b3);
+  background: linear-gradient(135deg, #7a295c, #f3f0f5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -23,36 +29,23 @@ body {
   box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-.text-gradient {
-    background: linear-gradient(135deg, #921b2f, #f395b3);
-    background-clip: text; /* Standardna verzija */
-    -webkit-background-clip: text; /* Za preglednike koji koriste -webkit- */
-    -webkit-text-fill-color: transparent; /* Za preglednike koji koriste -webkit- */
-    text-emphasis-color: transparent; /* Standardna verzija */
-    font-size: 12px;
-    margin-bottom: 15px;
-  }
-  
-
 .btn-primary {
-  background: linear-gradient(135deg, #f395b3, #921b2f);
+  background: linear-gradient(135deg, #f3f0f5, #7a295c);
   border: none;
   transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #921b2f, #66142c);
   transform: translateY(-2px);
 }
 
 .btn-success {
-  background: linear-gradient(135deg, #f7c9d7, #f395b3);
+  background: linear-gradient(135deg, #f3f0f5, #7a295c);
   border: none;
   transition: all 0.3s ease;
 }
 
 .btn-success:hover {
-  background: linear-gradient(135deg, #f395b3, #921b2f);
   transform: translateY(-2px);
 }
 

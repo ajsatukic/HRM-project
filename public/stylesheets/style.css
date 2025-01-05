@@ -23,7 +23,7 @@ h1, h2, h3 {
 }
 
 .header h1 {
-  font-size: 35px;
+  font-size: 45px;
   color: #4c275f;
   margin-bottom: 5px;
 }
@@ -89,7 +89,7 @@ h1, h2, h3 {
 }
 
 .card-body .btn:hover {
-  background-color: #5e1e46;
+  background-color: #ab3e83;
 }
 
 /* Table Styles */
