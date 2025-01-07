@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
 const { ensureLoggedIn } = require('../middleware/auth'); // Middleware za provjeru prijave
-const upload = require('../middleware/upload');
 
 // Ruta za prikaz forme za uređivanje
 router.get('/edit', ensureLoggedIn, async (req, res) => {
@@ -88,37 +87,5 @@ router.post('/update', ensureLoggedIn, async (req, res) => {
         res.status(500).send('Error updating profile');
     }
 });
-
-// Ruta za upload CV-a
-router.post('/upload-cv', ensureLoggedIn, upload.single('cv'), async (req, res) => {
-    const userId = req.session.user.id;
-
-    try {
-        if (!req.file) {
-            console.error('No file received');
-            return res.status(400).send('No file uploaded');
-        }
-
-        const cvPath = `/uploads/cvs/${req.file.filename}`;
-        console.log('File saved at:', cvPath); // Dodano za debuggiranje
-
-        // Spremanje putanje CV-a u bazu podataka
-        await pool.query(
-            `UPDATE candidates 
-             SET cv = $1 
-             WHERE user_id = $2 
-             ON CONFLICT (user_id) DO UPDATE SET cv = $1`,
-            [cvPath, userId]
-        );
-
-        console.log('CV path saved in database');
-        res.redirect('/profile/edit');
-    } catch (err) {
-        console.error('Error uploading CV:', err);
-        res.status(500).send('Error uploading CV');
-    }
-});
-
-
   
 module.exports = router;
