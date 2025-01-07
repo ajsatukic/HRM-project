@@ -2,31 +2,30 @@ const path = require('path');
 const express = require('express');
 const session = require('express-session');
 const methodOverride = require('method-override');
-const pool = require('./config/db'); // Dodaj konekciju prema bazi
+const pool = require('./config/db');
 
 const app = express();
 const port = 3000;
 
-app.use(express.json()); // Parsira JSON tijelo zahtjeva
-app.use(express.urlencoded({ extended: true })); // Parsira URL-encoded podatke iz formi
+// Middleware za parsiranje tijela zahtjeva
+app.use(express.urlencoded({ extended: true })); // Parsira URL-encoded podatke
+app.use(express.json()); // Parsira JSON podatke
 
 // Middleware za sesije
 app.use(
   session({
-    secret: 'your-secret-key', // Promijeni s jačim ključem za sigurnost
+    secret: 'sarajevo',
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false },
   })
 );
 
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
 // Statički folder
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static('public'));
-
-// Middleware za parsiranje tijela zahtjeva
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // Middleware za method override
 app.use(methodOverride('_method'));
@@ -34,32 +33,34 @@ app.use(methodOverride('_method'));
 // Postavljanje EJS kao view engine
 app.set('view engine', 'ejs');
 
+// Middleware funkcije
+const { ensureLoggedIn, ensureAdmin } = require('./middleware/auth');
+
 // Uvoz ruta
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const jobRoutes = require('./routes/jobs');
-const interviewsRoutes = require('./routes/interviews'); // Import ruta
+const interviewsRoutes = require('./routes/interviews');
 const notificationsRouter = require('./routes/notifications');
+const profileRouter = require('./routes/profile');
 
 // Korištenje ruta
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/jobs', jobRoutes);
-app.use('/interviews', interviewsRoutes); // Ruta za intervjue
-app.use('/notifications',notificationsRouter);
+app.use('/interviews', interviewsRoutes);
+app.use('/notifications', notificationsRouter);
+app.use('/profile', profileRouter);
+app.use('/uploads', express.static('uploads')); // Omogućava pristup upload folderu
 
 // Glavna ruta
 app.get('/', (req, res) => {
   res.redirect('/auth/login');
 });
 
-// Middleware funkcije
-const { ensureLoggedIn, ensureAdmin } = require('./middleware/auth');
-
 // Admin dashboard
 app.get('/admin-dashboard', ensureLoggedIn, ensureAdmin, async (req, res) => {
   try {
-    // Uzimanje statistike iz baze
     const activeJobs = await pool.query('SELECT COUNT(*) AS total FROM jobs WHERE status = $1', ['active']);
     const applications = await pool.query('SELECT COUNT(*) AS total FROM applications');
     const jobs = await pool.query('SELECT * FROM jobs ORDER BY created_at DESC');
@@ -70,7 +71,7 @@ app.get('/admin-dashboard', ensureLoggedIn, ensureAdmin, async (req, res) => {
         activeJobs: activeJobs.rows[0]?.total || 0,
         applications: applications.rows[0]?.total || 0,
       },
-      jobs: jobs.rows, // Prosljeđujemo liste poslova
+      jobs: jobs.rows,
     });
   } catch (err) {
     console.error('Error loading admin dashboard:', err);
@@ -78,25 +79,25 @@ app.get('/admin-dashboard', ensureLoggedIn, ensureAdmin, async (req, res) => {
   }
 });
 
-// Ruta za logout koristeći POST metodu
+// User dashboard
+app.get('/user-dashboard', ensureLoggedIn, (req, res) => {
+  res.render('user-dashboard', { user: req.session.user });
+});
+
+// Ruta za logout
 app.post('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       console.error('Error logging out:', err);
       return res.status(500).send('An error occurred while logging out.');
     }
-    res.redirect('/login'); // Preusmjeravanje na login stranicu
+    res.redirect('/auth/login');
   });
 });
+
+// Ruta za login
 app.get('/login', (req, res) => {
-  res.render('login'); // Pretpostavljamo da imaš `login.ejs`
-});
-
-
-
-// User dashboard
-app.get('/user-dashboard', ensureLoggedIn, (req, res) => {
-  res.render('user-dashboard', { user: req.session.user });
+  res.render('login');
 });
 
 // Pokretanje servera

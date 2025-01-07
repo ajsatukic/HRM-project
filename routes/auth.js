@@ -56,4 +56,29 @@ router.post('/register', async (req, res) => {
   }
 });
 
+router.get('/sync-candidates', async (req, res) => {
+  try {
+      // Dodavanje korisnika koji nisu admini u tabelu `candidates`
+      await pool.query(`
+          INSERT INTO candidates (user_id, phone, address, skills, experience, education)
+          SELECT 
+              user_id,
+              NULL AS phone,
+              NULL AS address,
+              NULL AS skills,
+              NULL AS experience,
+              NULL AS education
+          FROM users
+          WHERE role != 'admin'
+            AND user_id NOT IN (SELECT user_id FROM candidates)
+      `);
+
+      res.send('All non-admin users successfully synchronized with candidates!');
+  } catch (err) {
+      console.error('Error synchronizing candidates:', err);
+      res.status(500).send('Error synchronizing candidates');
+  }
+});
+
+
 module.exports = router;
