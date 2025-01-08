@@ -4,23 +4,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Interviews Calendar</title>
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <!-- FullCalendar CSS -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/stylesheets/calendar.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Interviews Calendar</h1>
-    <a href="/admin-dashboard" class="btn btn-primary w-100">Back to Dashboard</a>
-    <div id="calendar"></div>
-  </div>
 
-  <div id="eventPopup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); padding: 20px; border-radius: 10px; z-index: 1000; max-width: 400px; width: 90%;">
-    <h3 id="popupTitle" style="margin-top: 0; color: #4c275f;"></h3>
+      
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4 header-bar">
+          <h1><i class="fas fa-calendar-alt me-2"></i> Interviews Calendar</h1>
+          <a href="/admin-dashboard" class="btn btn-primary">Back to Dashboard</a>
+        </div>
+        <div id="calendar"></div>
+      </div>
+      
+      
+  <div id="eventPopup">
+    <h3 id="popupTitle"></h3>
     <p><strong>Date:</strong> <span id="popupDate"></span></p>
     <p><strong>Location:</strong> <span id="popupLocation"></span></p>
     <p><strong>Notes:</strong> <span id="popupNotes"></span></p>
+    <p><strong>Status:</strong> <span id="popupStatus"></span></p>
     <button id="deleteEvent" class="btn btn-primary" style="margin-right: 10px;">Delete</button>
     <button id="closePopup" class="btn btn-primary">Close</button>
   </div>
@@ -30,58 +36,74 @@
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const calendarEl = document.getElementById('calendar');
-        const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth', // Početni prikaz
-            events: '/interviews/api', // Ruta za dohvaćanje intervjua
-            editable: true,
-            selectable: true,
-            headerToolbar: {
-                left: 'prev,next today', // Zadržavamo strelice i "Today"
-                center: 'title', // Naslov kalendara
-                right: '' // Uklonjen izbor prikaza (month, week, day)
-            },
-            eventDidMount: function (info) {
-                const dateString = info.event.start.toISOString().split('T')[0];
-                const dayCell = document.querySelector(`[data-date="${dateString}"]`);
-                if (dayCell) {
-                    dayCell.classList.add('has-event'); // Dodaj klasu za osenčenje
-                }
-            },
-            eventClick: function (info) {
-                const popup = document.getElementById('eventPopup');
-                popup.style.display = 'block';
-    
-                document.getElementById('popupTitle').innerText = info.event.title;
-                document.getElementById('popupDate').innerText = new Date(info.event.start).toLocaleString();
-                document.getElementById('popupLocation').innerText = info.event.extendedProps.location || 'N/A';
-                document.getElementById('popupNotes').innerText = info.event.extendedProps.notes || 'N/A';
-    
-                const deleteBtn = document.getElementById('deleteEvent');
-                deleteBtn.onclick = async function () {
-                    if (confirm('Are you sure you want to delete this interview?')) {
-                        const response = await fetch(`/interviews/${info.event.id}`, {
-                            method: 'DELETE',
-                        });
-    
-                        if (response.ok) {
-                            alert('Interview deleted successfully.');
-                            info.event.remove();
-                            popup.style.display = 'none';
-                        } else {
-                            alert('Error deleting interview.');
-                        }
-                    }
-                };
+    const calendarEl = document.getElementById('calendar');
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth', // Početni prikaz
+        events: '/interviews/api', // Ruta za dohvaćanje intervjua
+        editable: true,
+        selectable: true,
+        headerToolbar: {
+            left: 'prev,next today', // Zadržavamo strelice i "Today"
+            center: 'title', // Naslov kalendara
+            right: '' // Uklonjen izbor prikaza (month, week, day)
+        },
+        eventDidMount: function (info) {
+            const dateString = info.event.start.toISOString().split('T')[0];
+            const dayCell = document.querySelector(`[data-date="${dateString}"]`);
+            if (dayCell) {
+                dayCell.classList.add('has-event'); // Dodaj klasu za osenčenje
             }
-        });
-    
-        calendar.render();
-    
-        document.getElementById('closePopup').onclick = function () {
-            document.getElementById('eventPopup').style.display = 'none';
-        };
+
+            // Dodaj status kao tooltip
+            if (info.event.extendedProps.status) {
+                const tooltip = document.createElement('span');
+                tooltip.className = 'status-tooltip';
+                tooltip.innerText = `Status: ${info.event.extendedProps.status}`;
+                info.el.appendChild(tooltip);
+            }
+        },
+        eventClick: function (info) {
+            const popup = document.getElementById('eventPopup');
+            popup.style.display = 'block';
+
+            document.getElementById('popupTitle').innerText = info.event.title;
+            document.getElementById('popupDate').innerText = new Date(info.event.start).toLocaleString();
+            document.getElementById('popupLocation').innerText = info.event.extendedProps.location || 'N/A';
+            document.getElementById('popupNotes').innerText = info.event.extendedProps.notes || 'N/A';
+            document.getElementById('popupStatus').innerText = info.event.extendedProps.status || 'Pending';
+
+            // Promjena pozadinske boje na osnovu statusa
+            const status = info.event.extendedProps.status || 'pending';
+            const popupContainer = document.getElementById('eventPopup');
+            popupContainer.className = ''; // Resetuje klase
+            popupContainer.classList.add(`status-${status}`); // Dodaje klasu za određeni status
+            
+            const deleteBtn = document.getElementById('deleteEvent');
+            deleteBtn.onclick = async function () {
+                if (confirm('Are you sure you want to delete this interview?')) {
+                    const response = await fetch(`/interviews/${info.event.id}`, {
+                        method: 'DELETE',
+                    });
+
+                    if (response.ok) {
+                        alert('Interview deleted successfully.');
+                        info.event.remove();
+                        popup.style.display = 'none';
+                    } else {
+                        alert('Error deleting interview.');
+                    }
+                }
+            };
+        }
     });
+
+    calendar.render();
+
+    document.getElementById('closePopup').onclick = function () {
+        document.getElementById('eventPopup').style.display = 'none';
+    };
+});
+
     </script>
 </body>
 </html>

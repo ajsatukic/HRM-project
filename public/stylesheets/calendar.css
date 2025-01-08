@@ -1,93 +1,191 @@
 body {
-  margin: 0;
-  padding: 0;
   font-family: 'Poppins', sans-serif;
   background-color: #f3f0f5;
-  color: #4c275f;
+  color: #2a1a29;
   margin: 0;
   padding: 0;
-  min-height: 100vh;
 }
 
 .container {
-  max-width: 790px;
-  margin: 50px auto;
+  max-width: 900px;
+  margin: 30px auto;
   padding: 20px;
   background: #ffffff;
-  border-radius: 15px;
-  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
+
 h1 {
-  font-size: 2.5rem;
-  font-weight: bold;
+  font-size: 1.8rem;
   color: #4c275f;
+  font-weight: bold;
   margin-bottom: 20px;
-  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+h1 i {
+  margin-right: 10px;
+}
+
+.btn {
+  background-color: #7a295c;
+  color: #ffffff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.btn:hover {
+  background-color: #5e1e46;
 }
 
 #calendar {
+  margin-top: 20px;
+  padding: 15px;
   background: #ffffff;
-  border-radius: 15px;
+  border-radius: 10px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  padding: 20px;
 }
-.btn-primary, .btn-success {
-  background: #7a295c;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 50px;
-  font-size: 1rem;
+
+.fc-toolbar-title {
+  color: #4c275f;
+  font-size: 1.5rem;
   font-weight: bold;
+}
+
+.fc-button {
+  background-color: #7a295c !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  padding: 5px 10px;
+}
+
+.fc-button:hover {
+  background-color: #5e1e46 !important;
+}
+
+.fc-daygrid-day {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+}
+
+.fc-event {
+  border: none;
+  border-radius: 5px;
+  font-size: 0.9rem;
+}
+
+.fc-daygrid-day:hover {
+  background-color: #f9f9f9;
+}
+
+.has-event {
+  background-color: #7a295c75 !important;
+}
+
+#eventPopup h3 {
+  margin-top: 0;
+  color: #4c275f;
+}
+
+
+.fc .fc-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fc .fc-toolbar-chunk {
+  display: flex;
+  align-items: center;
+}
+
+.fc .fc-toolbar-chunk .fc-button-group {
+  display: flex;
+}
+
+.fc .fc-daygrid-day-frame {
+  padding: 5px;
+}
+
+.fc-event-title {
+  font-size: 0.85rem;
+}
+
+.status-tooltip {
+  display: block;
+  font-size: 0.9rem;
   color: #ffffff;
-  text-transform: uppercase;
-  text-decoration: none;
-  transition: all 0.3s ease;
+  margin-top: 5px;
+  
+  padding: 5px;
+  border-radius: 5px;
+  text-align: center;
 }
-
-.btn-primary:hover, .btn-success:hover {
-  background-color: #ab3e83;
-  transform: translateY(-3px);
-}
-.fc-toolbar-chunk .fc-button {
-background: #7a295c;
-border: none;
-color: white;
-padding: 10px;
-border-radius: 5px;
-font-weight: bold;
-text-transform: uppercase;
-transition: all 0.3s ease;
-}
-
-.fc-toolbar-chunk .fc-button:hover {
-  background-color: #ab3e83;
-transform: scale(1.05);
-}
-
-.fc-daygrid-day.has-event {
-background: linear-gradient(135deg, #7a295c, #f3f0f5);
-border-radius: 5px;
-}
-
-.fc-daygrid-day.has-event:hover {
-cursor: pointer;
-transform: scale(1.03);
-}
-
 
 #eventPopup {
-animation: fadeIn 0.3s ease;
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  border-radius: 10px;
+  z-index: 1000;
+  max-width: 400px;
+  width: 90%;
+  transition: background-color 0.3s ease;
 }
 
-@keyframes fadeIn {
-from {
-opacity: 0;
-transform: translate(-50%, -60%);
-}
-to {
-opacity: 1;
-transform: translate(-50%, -50%);
-}
+#eventPopup.status-accepted {
+  background-color: #28a745;
+  opacity: 0.9;
+  color: white;
 }
 
+#eventPopup.status-pending {
+  background-color: #efd484;
+  opacity: 0.9;
+  color: black;
+}
+
+#eventPopup.status-rejected {
+  background-color: #e6727e;
+  opacity: 0.9;
+  color: white;
+}
+/* Stil za glavnu traku sa naslovom i dugmetom */
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-bar h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #4c275f;
+  font-weight: bold;
+}
+
+.header-bar .btn {
+  background-color: #7a295c;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-decoration: none;
+}
+
+.header-bar .btn:hover {
+  background-color: #5e1e46;
+}

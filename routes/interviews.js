@@ -6,16 +6,32 @@ const { ensureLoggedIn, ensureAdmin } = require('../middleware/auth');
 // Ruta za dohvaćanje svih intervjua (JSON za kalendar)
 router.get('/api', ensureLoggedIn, ensureAdmin, async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM interviews');
+    const result = await pool.query(`
+      SELECT 
+        i.interview_id, 
+        i.scheduled_at, 
+        i.location, 
+        i.notes, 
+        i.status, 
+        c.candidate_id, 
+        u.first_name, 
+        u.last_name 
+      FROM interviews i
+      JOIN candidates c ON i.candidate_id = c.candidate_id
+      JOIN users u ON c.user_id = u.user_id
+    `);
+
     const events = result.rows.map(row => ({
       id: row.interview_id,
-      title: `Interview with Candidate ${row.candidate_id}`,
+      title: `Interview with ${row.first_name} ${row.last_name}`,
       start: new Date(row.scheduled_at).toISOString(),
       extendedProps: {
         location: row.location,
         notes: row.notes,
+        status: row.status,
       },
     }));
+
     res.json(events);
   } catch (err) {
     console.error('Error fetching interviews:', err);
