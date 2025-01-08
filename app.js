@@ -39,20 +39,20 @@ const { ensureLoggedIn, ensureAdmin } = require('./middleware/auth');
 
 // Uvoz ruta
 const authRoutes = require('./routes/auth');
-const userRoutes = require('./routes/users');
+
 const jobRoutes = require('./routes/jobs');
 const interviewsRoutes = require('./routes/interviews');
 const notificationsRouter = require('./routes/notifications');
 const profileRouter = require('./routes/profile');
-
+const candidatesRoutes = require('./routes/candidates');
 // Korištenje ruta
 app.use('/auth', authRoutes);
-app.use('/users', userRoutes);
+
 app.use('/jobs', jobRoutes);
 app.use('/interviews', interviewsRoutes);
 app.use('/notifications', notificationsRouter);
 app.use('/profile', profileRouter);
-app.use('/uploads', express.static('uploads')); // Omogućava pristup upload folderu
+app.use('/candidates', candidatesRoutes);
 
 // Glavna ruta
 app.get('/', (req, res) => {

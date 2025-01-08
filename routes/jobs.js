@@ -4,7 +4,7 @@ const pool = require('../config/db');
 const { ensureLoggedIn, ensureAdmin } = require('../middleware/auth');
 
 // Ruta za prikaz svih poslova
-router.get('/', ensureLoggedIn, ensureAdmin, async (req, res) => {
+router.get('/', ensureLoggedIn, async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT 
@@ -34,7 +34,7 @@ router.get('/create', ensureLoggedIn, ensureAdmin, (req, res) => {
   res.render('create-job');
 });
 
-// Ruta za dodavanje novog posla
+// Ruta za dodavanje novog posla  
 router.post('/create', ensureLoggedIn, ensureAdmin, async (req, res) => {
   const { title, description, deadline } = req.body;
   const requirements = Array.isArray(req.body.required_documents)
@@ -48,6 +48,7 @@ router.post('/create', ensureLoggedIn, ensureAdmin, async (req, res) => {
     return res.redirect('/admin-dashboard?error=Missing+required+fields');
   }
 
+  // Validacija datuma pomoću ugrađenog `Date` objekta
   const deadlineDate = new Date(deadline);
   if (isNaN(deadlineDate.getTime()) || deadlineDate < new Date()) {
     console.error('Validation Error: Invalid deadline format or past date', { deadline });
@@ -118,13 +119,44 @@ router.post('/update-status', ensureLoggedIn, ensureAdmin, async (req, res) => {
   }
 });
 
-// Ruta za filtriranje poslova po statusu
+//ruta za filtriranje
 router.get('/filter', ensureLoggedIn, ensureAdmin, async (req, res) => {
   const { status } = req.query;
 
   if (!['active', 'expired'].includes(status)) {
-    console.error('Invalid filter status:', status);
     return res.status(400).json({ success: false, message: 'Invalid status filter' });
+  }
+
+  try {
+    const result = await pool.query(
+      `SELECT 
+        job_id, title, description, requirements, deadline, created_by, created_at,
+        CASE 
+          WHEN deadline >= CURRENT_DATE THEN 'active'
+          ELSE 'expired'
+        END AS status
+      FROM jobs
+      WHERE CASE 
+        WHEN deadline >= CURRENT_DATE THEN 'active'
+        ELSE 'expired'
+      END = $1
+      ORDER BY created_at DESC`,
+      [status]
+    );
+
+    res.json({ success: true, jobs: result.rows });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Error filtering jobs' });
+  }
+});
+
+// Ruta za pretragu poslova
+router.get('/search', ensureLoggedIn, ensureAdmin, async (req, res) => {
+  const { query } = req.query;
+
+  if (!query || query.trim() === '') {
+    console.error('Search query is missing or empty');
+    return res.status(400).json({ success: false, message: 'Search query is required' });
   }
 
   try {
@@ -143,21 +175,70 @@ router.get('/filter', ensureLoggedIn, ensureAdmin, async (req, res) => {
           ELSE 'expired'
         END AS status
       FROM jobs
-      WHERE CASE 
-        WHEN deadline >= CURRENT_DATE THEN 'active'
-        ELSE 'expired'
-      END = $1
+      WHERE title ILIKE $1 OR description ILIKE $1
       ORDER BY created_at DESC
       `,
-      [status]
+      [`%${query}%`]
     );
 
     res.json({ success: true, jobs: result.rows });
   } catch (err) {
-    console.error('Error filtering jobs:', err);
-    res.status(500).json({ success: false, message: 'Error filtering jobs' });
+    console.error('Error searching jobs:', err);
+    res.status(500).json({ success: false, message: 'Error searching jobs' });
   }
 });
+
+// Ruta za prikaz korisničkih prijava na posao
+router.get('/my-applications', ensureLoggedIn, async (req, res) => {
+  const userId = req.session.user.id;
+
+  try {
+    // Dohvati ID kandidata na osnovu korisnika
+    const candidateResult = await pool.query('SELECT candidate_id FROM candidates WHERE user_id = $1', [userId]);
+
+    if (candidateResult.rows.length === 0) {
+      console.error('No candidate ID found for this user.');
+      return res.status(404).send('You are not registered as a candidate.');
+    }
+
+    const candidateId = candidateResult.rows[0].candidate_id;
+
+    // Dohvati sve prijave za trenutnog kandidata
+    const applicationsResult = await pool.query(
+      `SELECT 
+          a.application_id,
+          a.status,
+          a.applied_at,
+          j.title AS job_title,
+          j.description AS job_description,
+          j.deadline
+       FROM applications a
+       JOIN jobs j ON a.job_id = j.job_id
+       WHERE a.candidate_id = $1
+       ORDER BY a.applied_at DESC`,
+      [candidateId]
+    );
+
+    // Provjera postoji li prijava
+    if (applicationsResult.rows.length === 0) {
+      return res.render('applications', {
+        user: req.session.user,
+        applications: [],
+        message: 'You have not applied for any jobs yet.',
+      });
+    }
+
+    // Render stranice sa prijavama
+    res.render('applications', {
+      user: req.session.user,
+      applications: applicationsResult.rows,
+    });
+  } catch (err) {
+    console.error('Error fetching job applications:', err);
+    res.status(500).send('Error fetching job applications.');
+  }
+});
+
 
 //ruta details za posao
 router.get('/:id', ensureLoggedIn, async (req, res) => {
@@ -280,97 +361,6 @@ router.get('/:job_id/rankings', ensureLoggedIn, ensureAdmin, async (req, res) =>
   }
 });
 
-//ruta za detalje kandidata koemantara i unos
-router.get('/candidates/:candidate_id', ensureLoggedIn, ensureAdmin, async (req, res) => {
-  const candidateId = parseInt(req.params.candidate_id, 10);
-
-  if (isNaN(candidateId)) {
-    console.error('Invalid candidate ID');
-    return res.status(400).render('error', { message: 'Invalid candidate ID', error: { status: 400 } });
-  }
-
-  try {
-    // Dohvat detalja kandidata
-    const candidateResult = await pool.query(`
-      SELECT 
-        u.first_name,
-        u.last_name,
-        c.job_id,
-        u.email,
-        c.candidate_id,
-        c.cv,
-        c.skills,
-        c.experience,
-        c.education
-      FROM candidates c
-      JOIN users u ON c.user_id = u.user_id
-      WHERE c.candidate_id = $1
-    `, [candidateId]);
-
-    if (candidateResult.rows.length === 0) {
-      return res.status(404).render('error', { message: 'Candidate not found', error: { status: 404 } });
-    }
-
-    // Dohvat komentara vezanih za kandidata
-    const commentsResult = await pool.query(`
-      SELECT 
-        com.comment,
-        com.created_at,
-        CONCAT(u.first_name, ' ', u.last_name) AS created_by
-      FROM comments com
-      JOIN users u ON com.created_by = u.user_id
-      WHERE com.candidate_id = $1
-      ORDER BY com.created_at DESC
-    `, [candidateId]);
-
-    // Dohvat recenzija vezanih za kandidata
-    const reviewsResult = await pool.query(`
-      SELECT 
-        r.rating, 
-        r.comment, 
-        r.created_at, 
-        CONCAT(u.first_name, ' ', u.last_name) AS created_by
-      FROM reviews r
-      JOIN users u ON r.created_by = u.user_id
-      WHERE r.candidate_id = $1
-      ORDER BY r.created_at DESC
-    `, [candidateId]);
-
-    res.render('candidate-details', {
-      candidate: candidateResult.rows[0],
-      comments: commentsResult.rows,
-      reviews: reviewsResult.rows // Dodavanje recenzija
-    });
-  } catch (err) {
-    console.error('Error fetching candidate details, comments, or reviews:', err);
-    res.status(500).render('error', { message: 'Error fetching candidate details, comments, or reviews', error: err });
-  }
-});
-
-// Ruta za unos komentara
-router.post('/candidates/:candidate_id/comments', ensureLoggedIn, ensureAdmin, async (req, res) => {
-  const candidateId = parseInt(req.params.candidate_id, 10);
-  const { comment } = req.body;
-
-  if (isNaN(candidateId) || !comment) {
-    console.error('Invalid candidate ID or missing comment');
-    return res.status(400).send('Invalid candidate ID or missing comment');
-  }
-
-  try {
-    await pool.query(`
-      INSERT INTO comments (candidate_id, created_by, comment, created_at)
-      VALUES ($1, $2, $3, CURRENT_TIMESTAMP)
-    `, [candidateId, req.session.user.id, comment]);
-
-    res.redirect(`/jobs/candidates/${candidateId}`);
-  } catch (err) {
-    console.error('Error adding comment:', err);
-    res.status(500).send('Error adding comment');
-  }
-});
-
-
 //ruta za promjenu statusa
 router.post('/applications/:application_id/status', ensureLoggedIn, ensureAdmin, async (req, res) => {
   const applicationId = parseInt(req.params.application_id, 10);
@@ -422,5 +412,73 @@ router.get('/applications/all', ensureLoggedIn, ensureAdmin, async (req, res) =>
   }
 });
 
+// Ruta za prijavu na posao
+router.post('/:id/apply', ensureLoggedIn, async (req, res) => {
+  const userId = req.session.user.id; // Dohvati ID korisnika iz sesije
+  const jobId = req.params.id; // Dohvati ID posla iz URL-a
+
+  try {
+      // Provjeri da li postoji kandidat povezan s ovim korisnikom
+      const candidateResult = await pool.query('SELECT candidate_id FROM candidates WHERE user_id = $1', [userId]);
+
+      if (candidateResult.rows.length === 0) {
+          console.error('Candidate not found for user ID:', userId);
+          return res.status(404).send('Candidate profile not found');
+      }
+
+      const candidateId = candidateResult.rows[0].candidate_id;
+
+      console.log('Candidate ID:', candidateId, 'Job ID:', jobId);
+
+      // Unesi prijavu u tabelu `applications`
+      await pool.query(
+          `INSERT INTO applications (job_id, candidate_id, status, applied_at)
+           VALUES ($1, $2, $3, NOW())`,
+          [jobId, candidateId, 'applied'] // Status postavi na 'applied'
+      );
+
+      console.log('Application submitted successfully!');
+      res.redirect('/applications'); // Preusmjeri na stranicu sa prijavama
+  } catch (err) {
+      console.error('Error applying for job:', err);
+      res.status(500).send('Error applying for job');
+  }
+});
+
+
+
+// Ruta za prikaz svih prijava korisnika
+router.get('/', ensureLoggedIn, async (req, res) => {
+  const userId = req.session.user.id;
+
+  try {
+      // Dohvati candidate_id za trenutnog korisnika
+      const candidateResult = await pool.query('SELECT candidate_id FROM candidates WHERE user_id = $1', [userId]);
+
+      if (candidateResult.rows.length === 0) {
+          console.error('Candidate not found for user ID:', userId);
+          return res.status(404).send('No applications found for this user');
+      }
+
+      const candidateId = candidateResult.rows[0].candidate_id;
+
+      // Dohvati sve prijave za ovog kandidata
+      const applicationsResult = await pool.query(
+          `SELECT a.application_id, a.status, a.applied_at, j.title AS job_title, j.description AS job_description
+           FROM applications a
+           INNER JOIN jobs j ON a.job_id = j.job_id
+           WHERE a.candidate_id = $1
+           ORDER BY a.applied_at DESC`,
+          [candidateId]
+      );
+
+      const applications = applicationsResult.rows;
+
+      res.render('applications', { applications }); // Render stranice za prikaz prijava
+  } catch (err) {
+      console.error('Error fetching applications:', err);
+      res.status(500).send('Error fetching applications');
+  }
+});
 
 module.exports = router;

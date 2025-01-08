@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Applications</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/stylesheets/app.css">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f3f0f5;
+      color: #2a1a29;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #4c275f;
+      font-weight: 600;
+    }
+
+    .table {
+      margin-top: 20px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .table th {
+      background-color: #7a295c;
+      color: #ffffff;
+      text-align: center;
+    }
+
+    .table td {
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .btn {
+      background-color: #7a295c;
+      color: #ffffff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    .btn:hover {
+      background-color: #5e1e46;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .btn {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      h1 {
+        font-size: 1.2rem;
+      }
+
+      .btn {
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="text-center">My Applications</h1>
+    <% if (applications.length > 0) { %>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Job Title</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Applied At</th>
+            <th>Application Deadline</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% applications.forEach(application => { %>
+            <tr>
+              <td><%= application.job_title %></td>
+              <td><%= application.job_description %></td>
+              <td><%= application.status %></td>
+              <td><%= new Date(application.applied_at).toLocaleDateString() %></td>
+              <td><%= new Date(application.application_deadline).toLocaleDateString() %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <p class="text-center mt-4"><%= message %></p>
+    <% } %>
+    <a href="/user-dashboard" class="btn d-block mx-auto">Back to Dashboard</a>
+  </div>
+</body>
+</html>

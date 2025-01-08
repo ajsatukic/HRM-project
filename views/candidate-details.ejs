@@ -5,59 +5,86 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Candidate Details</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="stylesheet" href="/stylesheets/candidate.css">
+  <link href="/stylesheets/style.css" rel="stylesheet">
 </head>
 <body>
-  <div class="container">
-    <h1><i class="fas fa-user"></i> Candidate Details</h1>
+  <div class="container mt-5">
+    <div class="header mb-4">
+      <h1>Candidate Details</h1>
+      <a href="/admin-dashboard" class="btn">Back to Dashboard</a>
+    </div>
 
+    <!-- Kandidat informacije -->
     <div class="card mb-4">
       <div class="card-header">Candidate Information</div>
       <div class="card-body">
-        <p><strong>Name:</strong> <%= candidate?.first_name || 'N/A' %> <%= candidate?.last_name || 'N/A' %></p>
-        <p><strong>Email:</strong> <%= candidate?.email || 'N/A' %></p>
-        <p><strong>Skills:</strong> <%= candidate?.skills || 'N/A' %></p>
-        <p><strong>Experience:</strong> <%= candidate?.experience || 'N/A' %></p>
-        <p><strong>Education:</strong> <%= candidate?.education || 'N/A' %></p>
-        <p><strong>CV:</strong> <a href="<%= candidate?.cv || '#' %>" target="_blank">Download CV</a></p>
+        <table class="table table-bordered">
+          <tr>
+            <th>Name</th>
+            <td><%= candidate.name %></td>
+          </tr>
+          <tr>
+            <th>Email</th>
+            <td><%= candidate.email %></td>
+          </tr>
+          <tr>
+            <th>Phone</th>
+            <td><%= candidate.phone ? candidate.phone : 'N/A' %></td>
+          </tr>
+          <tr>
+            <th>CV</th>
+            <td><a href="<%= candidate.cv %>" target="_blank">Download CV</a></td>
+          </tr>
+          <tr>
+            <th>Skills</th>
+            <td><%= candidate.skills %></td>
+          </tr>
+          <tr>
+            <th>Experience</th>
+            <td><%= candidate.experience %></td>
+          </tr>
+          <tr>
+            <th>Education</th>
+            <td><%= candidate.education %></td>
+          </tr>
+        </table>
       </div>
     </div>
 
+    <!-- Komentari -->
     <div class="card mb-4">
       <div class="card-header">Comments</div>
       <div class="card-body">
-        <% if (comments?.length > 0) { %>
+        <form action="/candidates/<%= candidate.candidate_id %>/comments" method="POST" class="mb-3">
+          <div class="mb-3">
+            <label for="comment" class="form-label">Add a Comment</label>
+            <textarea name="comment" id="comment" class="form-control" rows="3" required></textarea>
+          </div>
+          <button type="submit" class="btn">Submit Comment</button>
+        </form>
+
+        <% if (comments.length > 0) { %>
           <ul class="list-group">
             <% comments.forEach(comment => { %>
               <li class="list-group-item">
-                <strong><%= comment.created_by %>:</strong> <%= comment.comment %>
-                <br>
-                <small class="text-muted">Posted on <%= new Date(comment.created_at).toLocaleString() %></small>
+                <p><strong><%= comment.created_by %></strong>: <%= comment.comment %></p>
+                <small><%= new Date(comment.created_at).toLocaleString() %></small>
               </li>
             <% }) %>
           </ul>
         <% } else { %>
           <p>No comments yet.</p>
         <% } %>
-
-        <form action="/jobs/candidates/<%= candidate?.candidate_id %>/comments" method="POST" class="mt-3">
-          <div class="mb-3">
-            <label for="comment" class="form-label">Add a Comment</label>
-            <textarea name="comment" id="comment" class="form-control" rows="3" required></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary">Add Comment</button>
-        </form>
       </div>
     </div>
 
+    <!-- Zakazivanje intervjua -->
     <div class="card mb-4">
       <div class="card-header">Schedule Interview</div>
       <div class="card-body">
-        <form action="/interviews" method="POST">
-          <input type="hidden" name="candidate_id" value="<%= candidate?.candidate_id %>">
-          <input type="hidden" name="job_id" value="<%= candidate?.job_id %>">
-        
+        <form action="/candidates/interviews" method="POST">
+          <input type="hidden" name="user_id" value="<%= candidate.user_id %>">
+          <input type="hidden" name="job_id" value="<%= jobId %>">
           <div class="mb-3">
             <label for="scheduled_at" class="form-label">Date and Time</label>
             <input type="datetime-local" name="scheduled_at" id="scheduled_at" class="form-control" required>
@@ -70,29 +97,36 @@
             <label for="notes" class="form-label">Notes</label>
             <textarea name="notes" id="notes" class="form-control" rows="3"></textarea>
           </div>
-          <button type="submit" class="btn btn-success">Schedule Interview</button>
-        </form> 
+          <button type="submit" class="btn">Schedule Interview</button>
+        </form>
       </div>
     </div>
 
+    <!-- Recenzije -->
     <div class="card mb-4">
-      <div class="card-header text-white">Interview Review</div>
+      <div class="card-header">Reviews</div>
       <div class="card-body">
-        <% if (reviews?.length > 0) { %>
-          <ul class="list-group mb-3">
+        <% if (reviews.length > 0) { %>
+          <ul class="list-group">
             <% reviews.forEach(review => { %>
               <li class="list-group-item">
-                <strong><%= review.created_by %>:</strong> <%= review.comment %>
-                <br>
-                <small class="text-muted">Rating: <%= review.rating %>/10 | Posted on <%= new Date(review.created_at).toLocaleString() %></small>
+                <p><strong>Rating:</strong> <%= review.rating %> / 10</p>
+                <p><strong>Review:</strong> <%= review.comment %></p>
+                <p><small>By <strong><%= review.created_by %></strong> on <%= new Date(review.created_at).toLocaleString() %></small></p>
               </li>
             <% }) %>
           </ul>
         <% } else { %>
           <p>No reviews yet.</p>
         <% } %>
-    
-        <form action="/interviews/candidates/<%= candidate?.candidate_id %>/reviews" method="POST">
+      </div>
+    </div>
+
+    <!-- Dodavanje recenzije -->
+    <div class="card mb-4">
+      <div class="card-header">Add Review</div>
+      <div class="card-body">
+        <form action="/candidates/<%= candidate.candidate_id %>/reviews" method="POST">
           <div class="mb-3">
             <label for="rating" class="form-label">Rating (0-10)</label>
             <input type="number" name="rating" id="rating" class="form-control" min="0" max="10" step="1" required>
@@ -101,12 +135,10 @@
             <label for="comment" class="form-label">Review</label>
             <textarea name="comment" id="comment" class="form-control" rows="3" required></textarea>
           </div>
-          <button type="submit" class="btn btn-primary">Submit Review</button>
+          <button type="submit" class="btn">Submit Review</button>
         </form>
       </div>
     </div>
-    
-    <a href="/admin-dashboard" class="btn btn-primary w-100">Back to Dashboard</a>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

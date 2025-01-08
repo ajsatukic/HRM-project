@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Candidates</title>
+  <link rel="stylesheet" href="/stylesheets/style.css">
+  <style>
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      font-size: 1.8rem;
+      color: #4c275f;
+      margin: 0;
+    }
+
+    .header .btn {
+      background-color: #7a295c;
+      color: #ffffff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+
+    .header .btn:hover {
+      background-color: #5e1e46;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .table th, .table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+
+    .table th {
+      background-color: #f4f4f4;
+      color: #4c275f;
+    }
+
+    .table tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    .table tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    .btn {
+      padding: 8px 12px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .btn-primary {
+      background-color: #4c275f;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #3b1d4a;
+    }
+
+    .btn-danger {
+      background-color: #d9534f;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background-color: #c9302c;
+    }
+
+    .card {
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+
+    .card-header {
+      font-size: 1.2rem;
+      color: #4c275f;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Candidates Overview</h1>
+      <a href="/admin-dashboard" class="btn">Back to Dashboard</a>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-users icon"></i> Candidate List
+      </div>
+      <div class="card-body">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (candidates && candidates.length > 0) { %>
+              <% candidates.forEach(candidate => { %>
+                <tr>
+                  <td><%= candidate.name %></td>
+                  <td><%= candidate.email %></td>
+                  <td>
+                    <a href="/candidates/<%= candidate.id %>/details" class="btn btn-primary btn-sm">Details</a>
+                    <form action="/candidates/<%= candidate.id %>/delete" method="POST" style="display: inline;">
+                      <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }); %>
+            <% } else { %>
+              <tr>
+                <td colspan="3" class="text-center">No candidates available</td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>
