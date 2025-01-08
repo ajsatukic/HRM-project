@@ -96,7 +96,7 @@
                         <td><%= job.status %></td>
                         <td>
                           <a href="/jobs/<%= job.job_id %>" class="btn btn-primary btn-sm">Details</a>
-                          <button class="btn btn-danger btn-sm delete-job-btn" data-id="<%= job.job_id %>">Delete</button>
+                          <button class="decline-btn" data-id="<%= job.job_id %>">Delete</button>
                         </td>
                         <td>
                           <a href="/jobs/<%= job.job_id %>/applications" class="btn btn-secondary btn-sm">View Applications</a>

@@ -166,21 +166,61 @@ router.post('/:user_id/comments', ensureLoggedIn, ensureAdmin, async (req, res) 
 
 //zakazivanje
 router.post('/interviews', ensureLoggedIn, ensureAdmin, async (req, res) => {
-  const { user_id, job_id, scheduled_at, location, notes } = req.body;
+  const { user_id, scheduled_at, location, notes } = req.body;
   const createdBy = req.session.user.id; // ID korisnika koji zakazuje intervju
 
-  console.log('Received interview data:', { user_id, job_id, scheduled_at, location, notes });
+  console.log('Received interview data:', { user_id, scheduled_at, location, notes });
 
-  if (!user_id || !job_id || !scheduled_at || !location) {
+  if (!user_id || !scheduled_at || !location) {
     console.error('Validation Error: Missing required fields');
     return res.status(400).send('Missing required fields');
   }
 
   try {
-    await pool.query(`
-      INSERT INTO interviews (candidate_id, job_id, scheduled_at, location, notes, created_by)
-      VALUES ($1, $2, $3, $4, $5, $6)
-    `, [user_id, job_id, scheduled_at, location, notes, createdBy]);
+    // Dohvati najraniji job_id iz aplikacija za korisnika
+    const jobResult = await pool.query(
+      `
+      SELECT job_id
+      FROM applications
+      WHERE candidate_id = $1
+      ORDER BY applied_at ASC
+      LIMIT 1
+      `,
+      [user_id]
+    );
+
+    if (jobResult.rows.length === 0) {
+      console.error('No applications found for candidate:', user_id);
+      return res.status(404).send('No applications found for this candidate.');
+    }
+
+    const job_id = jobResult.rows[0].job_id;
+
+    console.log('Selected job_id:', job_id);
+
+    // Provjeri da li već postoji zakazan intervju za taj posao
+    const existingInterview = await pool.query(
+      `
+      SELECT 1
+      FROM interviews
+      WHERE candidate_id = $1 AND job_id = $2
+      `,
+      [user_id, job_id]
+    );
+
+    if (existingInterview.rows.length > 0) {
+      console.error('Interview already scheduled for this candidate and job:', { user_id, job_id });
+      return res.status(400).send('Interview already scheduled for this candidate and job.');
+    }
+
+    // Unesi intervju u bazu
+    await pool.query(
+      `
+      INSERT INTO interviews (candidate_id, job_id, scheduled_at, location, notes, created_by, status)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `,
+      [user_id, job_id, scheduled_at, location, notes, createdBy, 'pending']
+    );
 
     console.log('Interview scheduled successfully');
     res.redirect(`/candidates/${user_id}/details`);
@@ -189,6 +229,7 @@ router.post('/interviews', ensureLoggedIn, ensureAdmin, async (req, res) => {
     res.status(500).send('Error scheduling interview');
   }
 });
+
 
 
 // Route: Add review for a candidate

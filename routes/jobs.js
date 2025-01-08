@@ -416,32 +416,56 @@ router.get('/applications/all', ensureLoggedIn, ensureAdmin, async (req, res) =>
 router.post('/:id/apply', ensureLoggedIn, async (req, res) => {
   const userId = req.session.user.id; // Dohvati ID korisnika iz sesije
   const jobId = req.params.id; // Dohvati ID posla iz URL-a
+  const { coverLetter } = req.body; // Cover letter iz forme
 
   try {
-      // Provjeri da li postoji kandidat povezan s ovim korisnikom
-      const candidateResult = await pool.query('SELECT candidate_id FROM candidates WHERE user_id = $1', [userId]);
+    // Provjeri da li postoji kandidat povezan s ovim korisnikom
+    const candidateResult = await pool.query('SELECT candidate_id FROM candidates WHERE user_id = $1', [userId]);
 
-      if (candidateResult.rows.length === 0) {
-          console.error('Candidate not found for user ID:', userId);
-          return res.status(404).send('Candidate profile not found');
-      }
+    if (candidateResult.rows.length === 0) {
+      console.error('Candidate not found for user ID:', userId);
+      return res.status(404).send('Candidate profile not found');
+    }
 
-      const candidateId = candidateResult.rows[0].candidate_id;
+    const candidateId = candidateResult.rows[0].candidate_id;
 
-      console.log('Candidate ID:', candidateId, 'Job ID:', jobId);
+    console.log('Candidate ID:', candidateId, 'Job ID:', jobId);
 
-      // Unesi prijavu u tabelu `applications`
-      await pool.query(
-          `INSERT INTO applications (job_id, candidate_id, status, applied_at)
-           VALUES ($1, $2, $3, NOW())`,
-          [jobId, candidateId, 'applied'] // Status postavi na 'applied'
-      );
+    // Provjeri da li je kandidat već prijavljen na ovaj posao
+    const applicationResult = await pool.query(
+      'SELECT application_id FROM applications WHERE job_id = $1 AND candidate_id = $2',
+      [jobId, candidateId]
+    );
 
-      console.log('Application submitted successfully!');
-      res.redirect('/applications'); // Preusmjeri na stranicu sa prijavama
+    if (applicationResult.rows.length > 0) {
+      console.error('Candidate has already applied for this job:', jobId);
+      return res.status(400).send('You have already applied for this job');
+    }
+
+    // Unesi prijavu u tabelu `applications`
+    await pool.query(
+      `INSERT INTO applications (job_id, candidate_id, status, applied_at, cover_letter)
+       VALUES ($1, $2, $3, NOW(), $4)`,
+      [jobId, candidateId, 'applied', coverLetter]
+    );
+
+    console.log('Application submitted successfully!');
+
+    // Unesi obavijest u tabelu `notifications`
+    const message = `Candidate with ID ${candidateId} has applied for job ID ${jobId}.`;
+    await pool.query(
+      `INSERT INTO notifications (message, created_by, created_at)
+       VALUES ($1, $2, NOW())`,
+      [message, userId]
+    );
+
+    console.log('Notification created successfully!');
+
+    // Preusmjeri korisnika na user-dashboard
+    res.redirect('/user-dashboard');
   } catch (err) {
-      console.error('Error applying for job:', err);
-      res.status(500).send('Error applying for job');
+    console.error('Error applying for job:', err);
+    res.status(500).send('Error applying for job');
   }
 });
 

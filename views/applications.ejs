@@ -101,7 +101,6 @@
             <th>Description</th>
             <th>Status</th>
             <th>Applied At</th>
-            <th>Application Deadline</th>
           </tr>
         </thead>
         <tbody>
@@ -111,7 +110,6 @@
               <td><%= application.job_description %></td>
               <td><%= application.status %></td>
               <td><%= new Date(application.applied_at).toLocaleDateString() %></td>
-              <td><%= new Date(application.application_deadline).toLocaleDateString() %></td>
             </tr>
           <% }) %>
         </tbody>

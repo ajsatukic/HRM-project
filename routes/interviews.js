@@ -34,33 +34,6 @@ router.get('/calendar', ensureLoggedIn, ensureAdmin, async (req, res) => {
 });
 
 
-// Ažuriranje intervjua
-router.put('/:id', ensureLoggedIn, ensureAdmin, async (req, res) => {
-  const interviewId = parseInt(req.params.id, 10);
-  const { scheduled_at, location, notes } = req.body;
-
-  if (!scheduled_at || !location) {
-    console.error('Missing fields for interview update');
-    return res.status(400).json({ success: false, message: 'Missing required fields' });
-  }
-
-  try {
-    const result = await pool.query(
-      'UPDATE interviews SET scheduled_at = $1, location = $2, notes = $3 WHERE interview_id = $4',
-      [scheduled_at, location, notes || null, interviewId]
-    );
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({ success: false, message: 'Interview not found' });
-    }
-
-    res.json({ success: true, message: 'Interview updated successfully' });
-  } catch (err) {
-    console.error('Error updating interview:', err);
-    res.status(500).json({ success: false, message: 'Error updating interview' });
-  }
-});
-
 // Brisanje intervjua
 router.delete('/:id', ensureLoggedIn, ensureAdmin, async (req, res) => {
   const interviewId = parseInt(req.params.id, 10);
@@ -83,5 +56,102 @@ router.delete('/:id', ensureLoggedIn, ensureAdmin, async (req, res) => {
     res.status(500).json({ success: false, message: 'Error deleting interview' });
   }
 });
+
+//intervju za usera
+router.get('/user-interviews', ensureLoggedIn, async (req, res) => {
+  const userId = req.session.user.id; // ID korisnika iz sesije
+
+  try {
+    const interviewsResult = await pool.query(
+      `SELECT 
+         i.interview_id,
+         i.scheduled_at,
+         i.location,
+         i.notes,
+         i.status,
+         j.title AS job_title
+       FROM interviews i
+       JOIN candidates c ON i.candidate_id = c.candidate_id
+       JOIN jobs j ON i.job_id = j.job_id
+       WHERE c.user_id = $1
+       ORDER BY i.scheduled_at ASC`,
+      [userId]
+    );
+
+    const interviews = interviewsResult.rows;
+    res.render('user-interviews', { interviews });
+  } catch (err) {
+    console.error('Error fetching interviews:', err);
+    res.status(500).send('Error fetching interviews');
+  }
+});
+
+//azuriranje statusa accepted
+router.post('/:job_id/accept', ensureLoggedIn, async (req, res) => {
+  const { job_id } = req.params;
+  const userId = req.session.user.id;
+
+  try {
+    const candidateResult = await pool.query(
+      'SELECT candidate_id FROM candidates WHERE user_id = $1',
+      [userId]
+    );
+
+    if (candidateResult.rows.length === 0) {
+      console.error('Candidate not found for user ID:', userId);
+      return res.status(404).send('Candidate not found');
+    }
+
+    const candidateId = candidateResult.rows[0].candidate_id;
+
+    await pool.query(
+      `UPDATE interviews 
+       SET status = 'accepted' 
+       WHERE job_id = $1 AND candidate_id = $2`,
+      [job_id, candidateId]
+    );
+
+    console.log('Interview accepted successfully');
+    res.redirect('/notifications');
+  } catch (err) {
+    console.error('Error accepting interview:', err);
+    res.status(500).send('Error accepting interview');
+  }
+});
+
+//azurirannje statusa declined
+router.post('/:job_id/decline', ensureLoggedIn, async (req, res) => {
+  const { job_id } = req.params;
+  const userId = req.session.user.id;
+
+  try {
+    const candidateResult = await pool.query(
+      'SELECT candidate_id FROM candidates WHERE user_id = $1',
+      [userId]
+    );
+
+    if (candidateResult.rows.length === 0) {
+      console.error('Candidate not found for user ID:', userId);
+      return res.status(404).send('Candidate not found');
+    }
+
+    const candidateId = candidateResult.rows[0].candidate_id;
+
+    await pool.query(
+      `UPDATE interviews 
+       SET status = 'rejected' 
+       WHERE job_id = $1 AND candidate_id = $2`,
+      [job_id, candidateId]
+    );
+
+    console.log('Interview declined successfully');
+    res.redirect('/notifications');
+  } catch (err) {
+    console.error('Error declining interview:', err);
+    res.status(500).send('Error declining interview');
+  }
+});
+
+
 
 module.exports = router;

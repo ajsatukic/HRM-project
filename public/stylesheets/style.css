@@ -45,7 +45,21 @@ h1{
 }
 
 .header .btn:hover {
-  background-color: #5e1e46;
+  background-color: #973471;
+}
+
+.decline-btn {
+  background-color: #dc3545;
+  border: #dc3545;
+  color: #ffffff;
+  padding: 10px 15px;
+  border-radius: 8px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.decline-btn:hover {
+  background-color: #c82333;
 }
 
 .card {
@@ -54,6 +68,11 @@ h1{
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
   padding: 20px;
   margin-bottom: 30px;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
 }
 
 .card-header {
@@ -84,7 +103,7 @@ a{
 }
 
 .card-body .btn:hover {
-  background-color: #5e1e46;
+  background-color: #973471;
 }
 
 .btn-primary{
@@ -92,7 +111,7 @@ a{
   border: #7a295c;
 }
 .btn-primary:hover{
-  background-color: #5e1e46;
+  background-color: #973471;
 }
 
 @media (max-width: 768px) {
