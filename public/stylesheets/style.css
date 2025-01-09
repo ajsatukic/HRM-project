@@ -113,6 +113,49 @@ a{
 .btn-primary:hover{
   background-color: #973471;
 }
+.dashboard-stats {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 30px;
+}
+
+.dashboard-stats h2 {
+  font-size: 1.8rem;
+  color: #4c275f;
+  margin-bottom: 20px;
+}
+
+.chart-container {
+  display: flex;
+  flex-direction: column; /* Poredaj elemente vertikalno */
+  gap: 20px; /* Razmak između grafikona */
+}
+
+.chart-box {
+  width: 100%; /* Grafikon zauzima cijelu širinu */
+  max-height: 700px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+.chart-box h3 {
+  font-size: 1.2rem;
+  color: #4c275f;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .chart-box {
+    width: 100%;
+  }
+}
+
 
 @media (max-width: 768px) {
   .header {

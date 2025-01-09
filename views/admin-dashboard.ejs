@@ -118,140 +118,210 @@
         </div>
       </div>
     </div>
+
+    <div class="row mt-4">
+      <div class="col-md-12 mb-4">
+        <div class="card">
+          <div class="card-header">
+            <span><i class="fas fa-chart-bar" style="transform: rotate(270deg);"></i> Number of Applications per Job</span>
+          </div>
+          <div class="card-body">
+            <canvas id="applicationsChart" width="300" height="100"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <span><i class="fas fa-chart-line icon"></i> Average Ratings per Job</span>
+          </div>
+          <div class="card-body">
+            <canvas id="ratingsChart" width="300" height="100"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
     
+       
 </body>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const filterButtons = document.querySelectorAll('.filter-btn');
-  const searchForm = document.getElementById('search-form');
-  const searchInput = document.getElementById('searchInput');
-  const jobsTableBody = document.querySelector('tbody'); // Telo tabele za prikaz poslova
+  document.addEventListener('DOMContentLoaded', () => {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const searchForm = document.getElementById('search-form');
+    const searchInput = document.getElementById('searchInput');
+    const jobsTableBody = document.querySelector('tbody'); // Telo tabele za prikaz poslova
 
-  // Funkcija za ažuriranje tabele s poslovima
-  function updateJobsTable(jobs) {
-    jobsTableBody.innerHTML = ''; // Očisti trenutni sadržaj tabele
+    // Funkcija za ažuriranje tabele s poslovima
+    function updateJobsTable(jobs) {
+      jobsTableBody.innerHTML = ''; // Očisti trenutni sadržaj tabele
 
-    if (jobs.length > 0) {
-      jobs.forEach(job => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${job.title}</td>
-          <td>${job.status}</td>
-          <td>
-            <a href="/jobs/${job.job_id}" class="btn btn-primary btn-sm">Details</a>
-            <button class="decline-btn" data-id="${job.job_id}">Delete</button>
-          </td>
-          <td>
-            <a href="/jobs/${job.job_id}/applications" class="btn btn-primary btn-sm">View Applications</a>
-          </td>
-          <td>
-            <a href="/jobs/${job.job_id}/rankings" class="btn btn-primary btn-sm">View Rankings</a>
-          </td>
-        `;
-        jobsTableBody.appendChild(row);
-      });
+      if (jobs.length > 0) {
+        jobs.forEach(job => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${job.title}</td>
+            <td>${job.status}</td>
+            <td>
+              <a href="/jobs/${job.job_id}" class="btn btn-primary btn-sm">Details</a>
+              <button class="delete-job-btn" data-id="${job.job_id}">Delete</button>
+            </td>
+            <td>
+              <a href="/jobs/${job.job_id}/applications" class="btn btn-primary btn-sm">View Applications</a>
+            </td>
+            <td>
+              <a href="/jobs/${job.job_id}/rankings" class="btn btn-primary btn-sm">View Rankings</a>
+            </td>
+          `;
+          jobsTableBody.appendChild(row);
+        });
 
-      // Ponovno dodaj event listenere za dugmad za brisanje
-      attachDeleteEventListeners();
-    } else {
-      // Prikaži poruku ako nema poslova
-      jobsTableBody.innerHTML = '<tr><td colspan="5">No job postings available</td></tr>';
-    }
-  }
-
-  // Funkcija za filtriranje poslova
-  async function filterJobs(status) {
-    try {
-      const response = await fetch(`/jobs/filter?status=${status}`);
-      const result = await response.json();
-
-      if (response.ok) {
-        updateJobsTable(result.jobs);
+        // Ponovno dodaj event listenere za dugmad za brisanje
+        attachDeleteEventListeners();
       } else {
-        alert(result.message || 'Failed to filter jobs');
+        jobsTableBody.innerHTML = '<tr><td colspan="5">No job postings available</td></tr>';
       }
-    } catch (error) {
-      console.error('Error filtering jobs:', error);
-      alert('An error occurred while filtering jobs.');
     }
-  }
 
-  // Funkcija za pretragu poslova
-  async function searchJobs(query) {
-    try {
-      const response = await fetch(`/jobs/search?query=${encodeURIComponent(query)}`);
-      const result = await response.json();
+    // Funkcija za filtriranje poslova
+    async function filterJobs(status) {
+      try {
+        const response = await fetch(`/jobs/filter?status=${status}`);
+        const result = await response.json();
 
-      if (response.ok) {
-        updateJobsTable(result.jobs);
-      } else {
-        alert(result.message || 'Failed to search jobs');
-      }
-    } catch (error) {
-      console.error('Error searching jobs:', error);
-      alert('An error occurred while searching jobs.');
-    }
-  }
-
-  // Funkcija za ponovno dodavanje event listenera za dugmad za brisanje
-  function attachDeleteEventListeners() {
-    const deleteButtons = document.querySelectorAll('.delete-job-btn');
-
-    deleteButtons.forEach(button => {
-      button.addEventListener('click', async () => {
-        const jobId = button.getAttribute('data-id');
-
-        if (!confirm('Are you sure you want to delete this job?')) {
-          return;
+        if (response.ok) {
+          updateJobsTable(result.jobs);
+        } else {
+          alert(result.message || 'Failed to filter jobs');
         }
+      } catch (error) {
+        console.error('Error filtering jobs:', error);
+        alert('An error occurred while filtering jobs.');
+      }
+    }
 
-        try {
-          const response = await fetch(`/jobs/${jobId}`, {
-            method: 'DELETE'
-          });
+    // Funkcija za pretragu poslova
+    async function searchJobs(query) {
+      try {
+        const response = await fetch(`/jobs/search?query=${encodeURIComponent(query)}`);
+        const result = await response.json();
 
-          const result = await response.json();
+        if (response.ok) {
+          updateJobsTable(result.jobs);
+        } else {
+          alert(result.message || 'Failed to search jobs');
+        }
+      } catch (error) {
+        console.error('Error searching jobs:', error);
+        alert('An error occurred while searching jobs.');
+      }
+    }
 
-          if (response.ok) {
-            alert('Job deleted successfully');
-            button.closest('tr').remove(); // Uklanja red iz tabele
-          } else {
-            alert(result.message || 'Failed to delete job');
+    // Funkcija za ponovno dodavanje event listenera za dugmad za brisanje
+    function attachDeleteEventListeners() {
+      const deleteButtons = document.querySelectorAll('.delete-job-btn');
+
+      deleteButtons.forEach(button => {
+        button.addEventListener('click', async () => {
+          const jobId = button.getAttribute('data-id');
+
+          if (!confirm('Are you sure you want to delete this job?')) {
+            return;
           }
-        } catch (error) {
-          console.error('Error deleting job:', error);
-          alert('An error occurred while deleting the job.');
-        }
+
+          try {
+            const response = await fetch(`/jobs/${jobId}`, { method: 'DELETE' });
+
+            if (response.ok) {
+              alert('Job deleted successfully');
+              button.closest('tr').remove();
+            } else {
+              alert('Failed to delete job');
+            }
+          } catch (error) {
+            console.error('Error deleting job:', error);
+            alert('An error occurred while deleting the job.');
+          }
+        });
       });
-    });
-  }
-
-  // Dodavanje događaja na dugmad za filtriranje
-  filterButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      const status = button.getAttribute('data-status');
-      filterJobs(status);
-    });
-  });
-
-  // Dodavanje događaja na formu za pretragu
-  searchForm.addEventListener('submit', (event) => {
-    event.preventDefault(); // Spriječi ponovno učitavanje stranice
-    const query = searchInput.value.trim();
-
-    if (!query) {
-      alert('Please enter a search query');
-      return;
     }
 
-    searchJobs(query);
+    // Dodavanje događaja na dugmad za filtriranje
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const status = button.getAttribute('data-status');
+        filterJobs(status);
+      });
+    });
+
+    // Dodavanje događaja na formu za pretragu
+    searchForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const query = searchInput.value.trim();
+
+      if (!query) {
+        alert('Please enter a search query');
+        return;
+      }
+
+      searchJobs(query);
+    });
+
+    // Dodavanje grafova za statistiku
+    async function loadDashboardStats() {
+    try {
+      const response = await fetch('/dashboard/stats');
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.message);
+      }
+
+      const { jobStats, candidateStats, avgRatings } = result.data;
+
+      // Chart 1: Applications per Job
+      const applicationsChartCtx = document.getElementById('applicationsChart').getContext('2d');
+      new Chart(applicationsChartCtx, {
+        type: 'bar',
+        data: {
+          labels: jobStats.map(stat => stat.title),
+          datasets: [{
+            label: 'Number of Applications',
+            data: jobStats.map(stat => stat.application_count),
+            backgroundColor: 'rgb(122, 41, 92,0.8)',
+          }],
+        },
+        
+      });
+
+      // Chart 3: Average Ratings
+      const ratingsChartCtx = document.getElementById('ratingsChart').getContext('2d');
+      new Chart(ratingsChartCtx, {
+        type: 'line',
+        data: {
+          labels: avgRatings.map(stat => stat.title),
+          datasets: [{
+            label: 'Average Ratings',
+            data: avgRatings.map(stat => stat.avg_rating),
+            borderColor: 'rgb(76, 39, 95,0.8)',
+            fill: false,
+          }],
+        },
+      });
+    } catch (err) {
+      console.error('Error loading dashboard stats:', err);
+      alert('Failed to load dashboard stats.');
+    }
+  }
+
+  loadDashboardStats();
+
+
+    // Ponovno dodavanje event listenera za dugmad za brisanje
+    attachDeleteEventListeners();
   });
-
-  // Dodavanje događaja za postojeće dugmad za brisanje
-  attachDeleteEventListeners();
-});
-
 </script>
+
 
 </html>
