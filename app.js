@@ -45,14 +45,16 @@ const interviewsRoutes = require('./routes/interviews');
 const notificationsRouter = require('./routes/notifications');
 const profileRouter = require('./routes/profile');
 const candidatesRoutes = require('./routes/candidates');
+const reportsRouter = require('./routes/reports');
+
 // Korištenje ruta
 app.use('/auth', authRoutes);
-
 app.use('/jobs', jobRoutes);
 app.use('/interviews', interviewsRoutes);
 app.use('/notifications', notificationsRouter);
 app.use('/profile', profileRouter);
 app.use('/candidates', candidatesRoutes);
+app.use('/reports', reportsRouter);
 
 // Glavna ruta
 app.get('/', (req, res) => {

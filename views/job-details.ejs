@@ -65,6 +65,23 @@
       border-radius: 12px;
       box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
       padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .report-btn {
+      display: block;
+      text-align: center;
+      margin: 20px auto;
+      background-color: #7a295c;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .report-btn:hover {
+      background-color: #5e1e46;
     }
   </style>
 </head>
@@ -98,7 +115,32 @@
         </tr>
       </table>
     </div>
+    
+    <!-- Dugme za generisanje izvještaja -->
+    <a href="#" id="generateReport" data-job-id="<%= job.job_id %>" class="btn report-btn">
+      <i class="fas fa-file-pdf"></i>Generate Report
+    </a>    
   </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+  const generateReportButton = document.getElementById('generateReport');
+
+  generateReportButton.addEventListener('click', () => {
+    const jobId = generateReportButton.getAttribute('data-job-id');
+    
+    // Provjerite da li je job_id ispravan
+    if (!jobId) {
+      alert('Job ID is missing!');
+      return;
+    }
+
+    // Otvorite URL u novom prozoru ili preusmjerite korisnika
+    window.location.href = `/reports/${jobId}/generate-report`;
+  });
+});
+
+  </script>
 </body>
 </html>
