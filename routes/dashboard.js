@@ -26,10 +26,6 @@ router.get('/stats', async (req, res) => {
       GROUP BY j.title
     `);
 
-    console.log('Job Stats:', jobStats.rows);
-    console.log('Candidate Stats:', candidateStats.rows);
-    console.log('Average Ratings:', avgRatings.rows);
-
     res.json({
       success: true,
       data: {

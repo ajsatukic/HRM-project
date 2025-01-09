@@ -36,15 +36,10 @@ router.get('/edit', ensureLoggedIn, async (req, res) => {
     }
 });
 
-
-// Ruta za ažuriranje podataka u tabelama `users` i `candidates`
 // Ruta za ažuriranje podataka u tabelama `users` i `candidates`
 router.post('/update', ensureLoggedIn, async (req, res) => {
     const userId = req.session.user.id;
     const { firstName, lastName, email, phone, address, skills, experience, education } = req.body;
-
-    console.log('Received data from form:', req.body); // Praćenje podataka iz forme
-    console.log('User ID from session:', userId); // Provjera korisničkog ID-a
 
     try {
         // Dohvati trenutne vrijednosti iz baze ako nisu poslani kroz formu
@@ -61,15 +56,11 @@ router.post('/update', ensureLoggedIn, async (req, res) => {
         const lastNameToUpdate = lastName || user.last_name;
         const emailToUpdate = email || user.email;
 
-        console.log('Updating users table with:', { firstNameToUpdate, lastNameToUpdate, emailToUpdate, phone, address });
-
         // Ažuriraj tabelu `users`
         await pool.query(
             'UPDATE users SET first_name = $1, last_name = $2, email = $3, phone = $4, address = $5 WHERE user_id = $6',
             [firstNameToUpdate, lastNameToUpdate, emailToUpdate, phone, address, userId]
         );
-
-        console.log('Updating candidates table with:', { skills, experience, education });
 
         // Ažuriraj tabelu `candidates`
         await pool.query(
@@ -81,7 +72,7 @@ router.post('/update', ensureLoggedIn, async (req, res) => {
         );
 
         console.log('Profile successfully updated!');
-        res.redirect('/profile/edit'); // Preusmjeri nazad na profil
+        res.redirect('/profile/edit');
     } catch (err) {
         console.error('Error updating profile:', err);
         res.status(500).send('Error updating profile');

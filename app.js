@@ -26,7 +26,6 @@ app.use(cookieParser());
 
 // Statički folder
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/middleware/uploads', express.static('uploads'));
 
 // Middleware za method override
 app.use(methodOverride('_method'));

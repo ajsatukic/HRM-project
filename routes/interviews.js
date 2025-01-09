@@ -3,7 +3,7 @@ const router = express.Router();
 const pool = require('../config/db');
 const { ensureLoggedIn, ensureAdmin } = require('../middleware/auth');
 
-// Ruta za dohvaćanje svih intervjua (JSON za kalendar)
+// Ruta za dohvaćanje svih intervjua
 router.get('/api', ensureLoggedIn, ensureAdmin, async (req, res) => {
   try {
     const result = await pool.query(`
@@ -73,9 +73,9 @@ router.delete('/:id', ensureLoggedIn, ensureAdmin, async (req, res) => {
   }
 });
 
-//intervju za usera
+//Intervju za usera
 router.get('/user-interviews', ensureLoggedIn, async (req, res) => {
-  const userId = req.session.user.id; // ID korisnika iz sesije
+  const userId = req.session.user.id;
 
   try {
     const interviewsResult = await pool.query(
@@ -102,7 +102,7 @@ router.get('/user-interviews', ensureLoggedIn, async (req, res) => {
   }
 });
 
-//azuriranje statusa accepted
+//Azuriranje statusa accepted
 router.post('/:job_id/accept', ensureLoggedIn, async (req, res) => {
   const { job_id } = req.params;
   const userId = req.session.user.id;
@@ -135,7 +135,7 @@ router.post('/:job_id/accept', ensureLoggedIn, async (req, res) => {
   }
 });
 
-//azurirannje statusa declined
+//Azurirannje statusa declined
 router.post('/:job_id/decline', ensureLoggedIn, async (req, res) => {
   const { job_id } = req.params;
   const userId = req.session.user.id;

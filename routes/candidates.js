@@ -24,8 +24,6 @@ router.get('/', ensureLoggedIn, ensureAdmin, async (req, res) => {
 router.get('/:candidate_id/details', ensureLoggedIn, ensureAdmin, async (req, res) => {
   const candidateId = parseInt(req.params.candidate_id, 10);
 
-  console.log('Candidate ID in Route:', candidateId);
-
   if (isNaN(candidateId)) {
     console.error('Invalid candidate ID');
     return res.status(400).send('Invalid candidate ID');
@@ -48,8 +46,6 @@ router.get('/:candidate_id/details', ensureLoggedIn, ensureAdmin, async (req, re
       JOIN users u ON c.user_id = u.user_id
       WHERE c.candidate_id = $1
     `, [candidateId]);
-
-    console.log('Candidate Result:', candidateResult.rows);
 
     if (candidateResult.rows.length === 0) {
       console.error('Candidate not found');
@@ -84,9 +80,6 @@ router.get('/:candidate_id/details', ensureLoggedIn, ensureAdmin, async (req, re
     const candidate = candidateResult.rows[0];
     const comments = commentsResult.rows;
     const reviews = reviewsResult.rows;
-
-    console.log('Candidate details:', candidate);
-    console.log('Reviews:', reviews);
 
     res.render('candidate-details', {
       candidate,
@@ -134,9 +127,6 @@ router.post('/:user_id/comments', ensureLoggedIn, ensureAdmin, async (req, res) 
   const userId = parseInt(req.params.user_id, 10);
   const { comment } = req.body;
 
-  console.log('User ID:', userId);
-  console.log('Comment:', comment);
-
   if (!userId || !comment) {
     console.error('Validation Error: Missing user ID or comment');
     return res.status(400).send('Missing user ID or comment');
@@ -167,9 +157,7 @@ router.post('/:user_id/comments', ensureLoggedIn, ensureAdmin, async (req, res) 
 //zakazivanje
 router.post('/interviews', ensureLoggedIn, ensureAdmin, async (req, res) => {
   const { user_id, scheduled_at, location, notes } = req.body;
-  const createdBy = req.session.user.id; // ID korisnika koji zakazuje intervju
-
-  console.log('Received interview data:', { user_id, scheduled_at, location, notes });
+  const createdBy = req.session.user.id;
 
   if (!user_id || !scheduled_at || !location) {
     console.error('Validation Error: Missing required fields');
@@ -195,8 +183,6 @@ router.post('/interviews', ensureLoggedIn, ensureAdmin, async (req, res) => {
     }
 
     const job_id = jobResult.rows[0].job_id;
-
-    console.log('Selected job_id:', job_id);
 
     // Provjeri da li već postoji zakazan intervju za taj posao
     const existingInterview = await pool.query(
@@ -236,8 +222,6 @@ router.post('/interviews', ensureLoggedIn, ensureAdmin, async (req, res) => {
 router.post('/:user_id/reviews', ensureLoggedIn, ensureAdmin, async (req, res) => {
   const userId = parseInt(req.params.user_id, 10);
   const { rating, comment } = req.body;
-
-  console.log('Received data:', { userId, rating, comment });
 
   if (isNaN(userId) || isNaN(rating) || !comment) {
     console.error('Validation Error: Missing required fields');

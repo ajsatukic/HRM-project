@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Modern Admin Dashboard</title>
+  <title>Admin Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="/stylesheets/style.css">
@@ -141,21 +141,21 @@
         </div>
       </div>
     </div>
-    
        
 </body>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const filterButtons = document.querySelectorAll('.filter-btn');
     const searchForm = document.getElementById('search-form');
     const searchInput = document.getElementById('searchInput');
-    const jobsTableBody = document.querySelector('tbody'); // Telo tabele za prikaz poslova
+    const jobsTableBody = document.querySelector('tbody'); 
 
     // Funkcija za ažuriranje tabele s poslovima
     function updateJobsTable(jobs) {
-      jobsTableBody.innerHTML = ''; // Očisti trenutni sadržaj tabele
+      jobsTableBody.innerHTML = ''; 
 
       if (jobs.length > 0) {
         jobs.forEach(job => {
@@ -280,7 +280,7 @@
 
       const { jobStats, candidateStats, avgRatings } = result.data;
 
-      // Chart 1: Applications per Job
+      // Broj prijava po poslu -> grafik 1
       const applicationsChartCtx = document.getElementById('applicationsChart').getContext('2d');
       new Chart(applicationsChartCtx, {
         type: 'bar',
@@ -295,7 +295,7 @@
         
       });
 
-      // Chart 3: Average Ratings
+      // Prosjecne ocjene -> grafik 2
       const ratingsChartCtx = document.getElementById('ratingsChart').getContext('2d');
       new Chart(ratingsChartCtx, {
         type: 'line',
@@ -315,10 +315,7 @@
     }
   }
 
-  loadDashboardStats();
-
-
-    // Ponovno dodavanje event listenera za dugmad za brisanje
+    loadDashboardStats();
     attachDeleteEventListeners();
   });
 </script>

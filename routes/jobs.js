@@ -41,8 +41,6 @@ router.post('/create', ensureLoggedIn, ensureAdmin, async (req, res) => {
     ? req.body.required_documents.join(', ')
     : req.body.required_documents || '';
 
-  console.log('Received data:', { title, description, requirements, deadline });
-
   if (!title || !description || !deadline || !requirements) {
     console.error('Validation Error: Missing required fields');
     return res.redirect('/admin-dashboard?error=Missing+required+fields');
@@ -61,7 +59,6 @@ router.post('/create', ensureLoggedIn, ensureAdmin, async (req, res) => {
   }
 
   try {
-    console.log('Executing SQL query...');
     const result = await pool.query(
       `
       INSERT INTO jobs (title, description, requirements, deadline, created_by, status) 
@@ -80,7 +77,6 @@ router.post('/create', ensureLoggedIn, ensureAdmin, async (req, res) => {
 // Ruta za brisanje posla
 router.delete('/:id', ensureLoggedIn, ensureAdmin, async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  console.log('Delete Request for Job ID:', id);
 
   if (isNaN(id)) {
     console.error('Invalid job ID');
@@ -268,11 +264,6 @@ router.get('/:id', ensureLoggedIn, async (req, res) => {
 router.get('/:job_id/applications', ensureLoggedIn, ensureAdmin, async (req, res) => {
   const jobId = parseInt(req.params.job_id, 10);
 
-  if (isNaN(jobId)) {
-    console.error('Invalid job ID');
-    return res.status(400).render('error', { message: 'Invalid job ID', error: { status: 400 } });
-  }
-
   try {
     const result = await pool.query(`
       SELECT 
@@ -378,7 +369,6 @@ router.post('/applications/:application_id/status', ensureLoggedIn, ensureAdmin,
       WHERE application_id = $2
     `, [status, applicationId]);
 
-    console.log('Application status updated:', { applicationId, status });
     res.redirect('back');
   } catch (err) {
     console.error('Error updating application status:', err);
@@ -428,8 +418,6 @@ router.post('/:id/apply', ensureLoggedIn, async (req, res) => {
     }
 
     const candidateId = candidateResult.rows[0].candidate_id;
-
-    console.log('Candidate ID:', candidateId, 'Job ID:', jobId);
 
     // Provjeri da li je kandidat već prijavljen na ovaj posao
     const applicationResult = await pool.query(
@@ -498,7 +486,7 @@ router.get('/', ensureLoggedIn, async (req, res) => {
 
       const applications = applicationsResult.rows;
 
-      res.render('applications', { applications }); // Render stranice za prikaz prijava
+      res.render('applications', { applications });
   } catch (err) {
       console.error('Error fetching applications:', err);
       res.status(500).send('Error fetching applications');

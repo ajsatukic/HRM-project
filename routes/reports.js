@@ -4,7 +4,7 @@ const pool = require('../config/db');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
-const logoPath = path.join(__dirname, '../public/images/logo.jpg'); // Provjerite tačnost putanje
+const logoPath = path.join(__dirname, '../public/images/logo.jpg'); 
 
 // Funkcija za generisanje PDF izvještaja
 async function generateReport(jobId, reportData) {
@@ -21,7 +21,7 @@ async function generateReport(jobId, reportData) {
 
   // Dodavanje logotipa
   try {
-    doc.image(logoPath, doc.page.width - 100, 20, { width: 80 }); // Postavite širinu logotipa
+    doc.image(logoPath, doc.page.width - 100, 20, { width: 80 }); 
   } catch (err) {
     console.error('Error loading logo image:', err);
   }
