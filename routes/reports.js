@@ -125,12 +125,12 @@ router.get('/:job_id/generate-report', async (req, res) => {
 
     // Preuzimanje fajla
     res.download(filePath, `job_${job_id}_report.pdf`, (err) => {
-  if (err) {
-    console.error('Error sending file:', err);
-    res.status(500).send('Error generating report');
-  } else {
-    console.log('Report sent successfully.');
-  }
+    if (err) {
+      console.error('Error sending file:', err);
+      res.status(500).send('Error generating report');
+    } else {
+      console.log('Report sent successfully.');
+    }
 });
 
   } catch (err) {

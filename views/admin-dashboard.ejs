@@ -33,7 +33,7 @@
 
       <div class="col-lg-6">
         <div class="card">
-          <div class="card-header"><i class="fas fa-folder-open icon"></i> Candidates</div>
+          <div class="card-header"><i class="fas fa-folder-open icon"></i> Applications</div>
           <div class="card-body">
             <p>Track and manage applications effectively.</p>
             <a href="/jobs/applications/all" class="btn btn-primary">View Applications</a>
@@ -96,7 +96,7 @@
                         <td><%= job.status %></td>
                         <td>
                           <a href="/jobs/<%= job.job_id %>" class="btn btn-primary btn-sm">Details</a>
-                          <button class="decline-btn" data-id="<%= job.job_id %>">Delete</button>
+                          <button class="delete-job-btn" data-id="<%= job.job_id %>">Delete</button>
                         </td>
                         <td>
                           <a href="/jobs/<%= job.job_id %>/applications" class="btn btn-secondary btn-sm">View Applications</a>
@@ -267,7 +267,10 @@
 
       searchJobs(query);
     });
-
+    
+    // Dodavanje događaja za postojeće dugmad za brisanje
+    attachDeleteEventListeners();
+    
     // Dodavanje grafova za statistiku
     async function loadDashboardStats() {
     try {

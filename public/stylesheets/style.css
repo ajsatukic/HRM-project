@@ -48,7 +48,7 @@ h1{
   background-color: #973471;
 }
 
-.decline-btn {
+.decline-btn, .delete-job-btn {
   background-color: #dc3545;
   border: #dc3545;
   color: #ffffff;
